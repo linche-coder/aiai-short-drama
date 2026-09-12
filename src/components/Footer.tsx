@@ -1,0 +1,1 @@
+export function Footer() { return <footer className="site-footer container"><div><img src="/assets/brand/logo.svg" width="1000" height="301" alt="爱爱短剧" /><p>让每一份热爱，都有好故事相伴。</p></div><div className="footer-note"><span>好故事，一眼入戏。</span><small>首页预览版 · 作品排列与题材为演示内容</small></div></footer>; }
