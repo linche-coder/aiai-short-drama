@@ -1,0 +1,60 @@
+/* Interaction corrections share the existing palette and card geometry. */
+:root{--action-gradient:linear-gradient(110deg,#b84138 0%,#bd2862 56%,#8740ac 100%)}
+.primary-button{color:#fff;font-weight:600;background:var(--action-gradient)}
+.primary-button:active:not(:disabled){transform:translateY(1px);filter:brightness(.94)}
+.primary-button:disabled{color:#c1b5c7;background:#423749;box-shadow:none;opacity:1;filter:none;transform:none;cursor:not-allowed;transition:none}
+.site-header nav .nav-active{color:#fff;font-weight:600}
+.nav-active:after{position:absolute;content:'';bottom:16px;width:14px;height:3px;border-radius:3px;background:var(--gradient);left:50%;transform:translateX(-50%)}
+.header-inner,.search-box{min-width:0}
+.header-inner>*{min-width:0}
+.search-box{max-width:100%;height:44px;padding-right:0}
+.search-box>svg{flex-shrink:0}.search-hint{margin-right:12px}
+.search-clear,.modal-close{width:44px;height:44px;flex-shrink:0}
+.site-header nav a,.header-actions button,.genre-filters button,.text-button,.autoplay-button,.back-link,.episode-panel button{min-height:44px;min-width:44px}
+.site-header nav a{justify-content:center}
+.header-actions .account-button{min-width:44px;min-height:44px}
+.genre-filters button{display:grid;place-items:center}
+.filter-bar,.drama-section,.empty-state{scroll-margin-top:0}
+.filter-bar:focus{outline:none}.filter-bar:focus-visible{outline:2px solid #ff9ebe;outline-offset:5px}
+.card-title{min-height:3.2em;font-size:15px}.card-title h3{line-height:1.6}
+.carousel-dots{height:44px;gap:0}
+.carousel-dots button,.carousel-dots button.selected{width:44px;height:44px;transition:none;flex-shrink:0}
+.carousel-dots button:after{inset:20px 14px;transition:background .2s,inset .2s}
+.carousel-dots button.selected:after{inset-inline:8px}
+.autoplay-button{justify-content:center}
+.carousel-controls{gap:16px;max-width:calc(100% - 24px)}
+@media(hover:hover) and (pointer:fine){.primary-button:hover:not(:disabled):not(:active){filter:brightness(1.04)}}
+@media(max-width:800px){
+  .header-inner{grid-template-columns:auto minmax(0,1fr) auto;column-gap:12px;grid-template-rows:64px 44px}
+  .site-header nav{gap:12px}.nav-active:after{bottom:7px}
+  .header-actions{gap:8px}.search-box{height:44px}
+}
+@media(max-width:540px){
+  :root{--header-height:160px}
+  .site-header{--header-height:160px;height:var(--header-height)}
+  .header-inner,.site-header:has(.header-spacer) .header-inner{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:56px 44px 44px;gap:4px 8px;padding-bottom:8px}
+  .brand{grid-column:1;grid-row:1;width:123px}
+  .header-actions,.site-header:has(.header-spacer) .header-actions{grid-column:2;grid-row:1;gap:8px;width:auto;margin:0}
+  .header-actions button{padding:0;justify-content:center;font-size:13px}
+  .site-header nav,.site-header:has(.header-spacer) nav{grid-column:1/-1;grid-row:2;justify-content:center;gap:24px;padding:0;margin:0}
+  .site-header nav a{font-size:13px;min-width:56px}
+  .nav-active:after{bottom:2px}
+  .search-box{grid-column:1/-1;grid-row:3;height:44px;width:100%}
+  .search-box input{font-size:13px}.search-hint{font-size:12px}
+  .site-header:has(.header-spacer){height:108px}
+  .site-header:has(.header-spacer) .header-inner{grid-template-rows:56px 44px;padding-bottom:4px}
+  html:has(.header-spacer){--header-height:108px}
+  .genre-filters{gap:4px}.genre-filters button{font-size:12px;padding:8px 10px}
+  .filter-bar .text-button,.section-meta .text-button{font-size:12px;padding:8px}
+  .carousel-arrow{width:44px;height:44px;top:calc(50% - 22px)}
+  .carousel-arrow.previous{left:4px}.carousel-arrow.next{right:4px}
+  .carousel-controls{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:44px 44px;height:auto;width:min(300px,calc(100% - 32px));gap:0;padding:2px 12px;border-radius:24px}
+  .slide-number{justify-self:center;font-size:12px}.autoplay-button{grid-column:2;grid-row:1;font-size:12px;padding:0 12px}
+  .carousel-dots{grid-column:1/-1;grid-row:2;justify-self:center}
+  .card-title{font-size:13px;min-height:3.2em}.card-title h3{font-size:13px}
+  .drama-card>p,.info-genre,.section-count,.section-heading p,.back-link{font-size:12px}
+  .watch-cue,.catalog-info .watch-cue{font-size:13px}
+  .section-heading{gap:8px;align-items:flex-start}.section-heading>div:first-child{min-width:0}
+  .section-meta{flex-shrink:0}.section-heading h2{font-size:19px}
+  .no-source .primary-button{min-height:44px;font-size:13px}
+}

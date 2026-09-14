@@ -1,0 +1,9 @@
+﻿import {chromium} from '@playwright/test';
+import fs from 'node:fs/promises';
+const browser=await chromium.launch({channel:'chrome'});const page=await browser.newPage({viewport:{width:320,height:812},reducedMotion:'reduce'});const errors=[];
+page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()} ${r.url()}`);});
+await page.goto('http://localhost:4173/#home');await page.locator('.intro').waitFor({state:'detached'});if(await page.locator('.intro-replay').count())throw Error('DEV replay in production');
+await page.getByRole('button',{name:'悬疑',exact:true}).click();await page.getByRole('navigation').getByText('最新',{exact:true}).click();await page.waitForTimeout(200);if(await page.locator('.drama-card').count()!==18)throw Error('navigation did not reset');
+await page.getByRole('textbox').fill('月色');await page.waitForTimeout(350);await page.locator('.drama-card').click();await page.reload();await page.locator('.no-source').waitFor();if(await page.locator('video').count())throw Error('invalid video rendered');await page.goBack();await page.getByRole('textbox').waitFor();
+await page.getByRole('button',{name:'登录 / 注册'}).click();await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'detached'});
+const report={url:'http://localhost:4173',viewport:{width:320,height:812},checks:['production bundle loads','no DEV replay control','genre to latest resets results','search hit','direct detail refresh','no player without sources','browser back restores search','account dialog opens and Esc closes'],errors,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)};await fs.writeFile('docs/round-5/production-smoke.json',JSON.stringify(report,null,2));console.log(report);await browser.close();if(errors.length||report.overflow)process.exitCode=1;

@@ -1,0 +1,7 @@
+﻿/* Card presentation from the pre-M4 snapshot; current page/navigation styles stay in place. */
+.drama-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));column-gap:24px;row-gap:32px}
+.card-title{font-size:15px;min-height:3.2em}.card-title h3{font-size:15px;line-height:1.6}.drama-card>p{font-size:11px;color:#a194af;margin-top:6px}.section-meta{max-width:none;gap:18px;flex-direction:row;align-items:center}.section-heading{align-items:center}.section-heading h2{font-size:24px}.section-heading p{font-size:12px}.card-poster img{object-fit:cover}
+@media(min-width:901px) and (max-width:1350px){.drama-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:1100px){.card-title h3{font-size:14px}}
+@media(max-width:900px){.drama-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 20px}.section-heading h2{font-size:22px}.section-heading p{font-size:11px}}
+@media(max-width:540px){.drama-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:25px 15px}.card-title,.card-title h3{font-size:13px}.card-title{min-height:3.2em}.drama-card>p,.section-count,.section-heading p{font-size:12px}.section-meta{gap:8px;flex-direction:column;align-items:flex-end}.section-heading{gap:8px;align-items:flex-start}.section-heading h2{font-size:19px}.section-meta .text-button{font-size:12px}}

@@ -1,8 +1,7 @@
 ﻿import { useLayoutEffect, useRef } from 'react';
-import { SlidersHorizontal } from 'lucide-react';
 import { genres } from '../data/dramas';
 import type { Genre } from '../data/dramas';
-export function Filters({ selected, onSelect, count, active, onReset }: { selected: Genre; onSelect: (genre: Genre) => void; count: number; active: boolean; onReset: () => void }) {
+export function Filters({ selected, onSelect }: { selected: Genre; onSelect: (genre: Genre) => void }) {
   const tabs = useRef<HTMLDivElement>(null);
   const highlight = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
@@ -16,5 +15,5 @@ export function Filters({ selected, onSelect, count, active, onReset }: { select
     if (tabs.current) observer.observe(tabs.current);
     return () => observer.disconnect();
   }, [selected]);
-  return <div className="filter-bar" id="browse"><div className="filter-label"><SlidersHorizontal size={18} /><span>探索短剧</span></div><div ref={tabs} className="genre-filters" role="group" aria-label="题材筛选"><span ref={highlight} className="genre-highlight" aria-hidden="true" />{genres.map(genre => <button key={genre} className={selected === genre ? 'active' : ''} onClick={() => onSelect(genre)} aria-pressed={selected === genre}>{genre}</button>)}</div><span className="filter-result" aria-live="polite">{active ? `${count} 部结果` : '找到属于你的故事'}</span>{active && <button className="text-button" onClick={onReset}>重置筛选</button>}</div>;
+  return <div className="home-genre-filter" id="browse" tabIndex={-1}><div ref={tabs} className="genre-filters" role="group" aria-label="题材筛选"><span ref={highlight} className="genre-highlight" aria-hidden="true" />{genres.map(genre => <button key={genre} className={selected === genre ? 'active' : ''} onClick={() => onSelect(genre)} aria-pressed={selected === genre}>{genre}</button>)}</div></div>;
 }

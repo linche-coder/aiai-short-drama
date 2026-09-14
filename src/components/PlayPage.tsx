@@ -1,45 +1,43 @@
-import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Film, RotateCcw } from 'lucide-react';
-import { dramas } from '../data/dramas';
-import type { VideoSource } from '../data/videoSources';
-import { Link } from '../navigation/Router';
-import { Header } from './Header';
-import { Poster } from './Poster';
-import { Footer } from './Footer';
-
-function VideoPlayer({ sources, title }: { sources: VideoSource[]; title: string }) {
-  const [status, setStatus] = useState<'loading'|'ready'|'error'>('loading');
-  const [attempt,setAttempt]=useState(0);
-  const video=useRef<HTMLVideoElement>(null);
-  const [ratio,setRatio]=useState<number>();
-  useEffect(()=>{
-    const el=video.current!;
-    return()=>el.pause();
-  },[attempt]);
-  useEffect(()=>{if(status!=='loading')return;const timeout=window.setTimeout(()=>setStatus('error'),15000);return()=>clearTimeout(timeout);},[status,attempt]);
-  return <div className="video-stage" style={ratio ? {aspectRatio:Math.max(ratio, .65)} : undefined} data-status={status}>
-    <video key={attempt} ref={video} controls={status!=='error'} playsInline preload="metadata" aria-label={`${title}视频播放器`} onLoadedMetadata={e=>{const v=e.currentTarget;setRatio(v.videoWidth/v.videoHeight);setStatus('ready');}} onCanPlay={()=>setStatus('ready')} onWaiting={()=>setStatus('loading')} onPlaying={()=>setStatus('ready')} onError={()=>setStatus('error')}>
-      {sources.map((source,i)=><source key={source.src} src={source.src} type={source.type} onError={()=>{if(i===sources.length-1)setStatus('error');}} />)}
-      您的浏览器不支持 HTML 视频播放。
-    </video>
-    {status==='loading' && <div className="video-status" role="status"><span className="loading-ring"/>正在加载视频…</div>}
-    {status==='error' && <div className="video-status video-error" role="alert"><Film size={32}/><h2>视频暂时无法播放</h2><p>片源可能不可用，或浏览器不支持该格式。</p><button className="primary-button" onClick={()=>{setStatus('loading');setAttempt(n=>n+1);}}><RotateCcw size={16}/>重新加载</button></div>}
-  </div>;
+﻿import{useEffect,useMemo,useState,useSyncExternalStore}from'react';
+import{Heart,MessageCircle,Copy,Lock,AudioLines,ChevronDown,ChevronUp,BookOpen}from'lucide-react';
+import{useReadyScroll}from'../navigation/useReadyScroll';import{useRouter,Link}from'../navigation/Router';
+import{VideoPlayer}from'./VideoPlayer';import{Breadcrumb}from'./Breadcrumb';import{DialogShell}from'./DialogShell';import{DramaGrid}from'./DramaGrid';
+import{useContents}from'../services/hooks';import{greenContext,contentService}from'../services/content';import{adultContext}from'../pages/AdultPages';import{accessService}from'../services/access';import{accountService}from'../services/membership';
+import{playableEpisodes,usableSources}from'../data/media';import{demoEpisodes,demoUnlocked,demoPlayback}from'../data/demoPlayback';import{playbackDecision}from'../services/rules';import{records,useRecords}from'../state/records';
+import{EmptyState,LoadingState,ErrorState}from'./content/PageParts';import type{Content,Tier}from'../types/content';
+export function PlayPage({id,adult=false,reading=false}:{id:string;adult?:boolean;reading?:boolean}){
+ const context=adult?adultContext:greenContext,data=useContents(context);useReadyScroll(!data.loading);const drama=data.items.find(c=>c.id===id);
+ useEffect(()=>{sessionStorage.setItem('aiai:intro-seen','yes');document.title=adult?'爱爱短剧 · 私密浏览':drama?`${drama.title} · 爱爱短剧`:'爱爱短剧 · 作品详情';return()=>{document.title='爱爱短剧 · 好故事，一眼入戏';};},[drama,adult]);
+ if(data.loading)return <main className="container page"><Breadcrumb current="作品详情"/><LoadingState/></main>;
+ if(data.error)return <main className="container page"><Breadcrumb current="作品详情"/><ErrorState message={data.error} retry={data.retry}/></main>;
+ if(!drama)return <main className="container page"><Breadcrumb current="作品详情"/><EmptyState title="没有找到这部作品"><Link className="primary-button" href={adult?'/18plus':'/#home'}>返回内容首页</Link></EmptyState></main>;
+ if(reading&&drama.format!=='article')return <main className="container page"><Breadcrumb current={drama.title}/><EmptyState title="此作品不支持文章阅读"><Link className="primary-button" href={adult?`/18plus/play/${id}`:`/play/${id}`}>查看作品</Link></EmptyState></main>;
+ if(drama.format==='article')return <main className="container page"><Breadcrumb current={drama.title}/><h1>{drama.title}</h1><article className="article-body surface-panel"><BookOpen/><p>{drama.body}</p></article></main>;
+ return <WatchPage key={id} drama={drama} adult={adult} items={data.items}/>;
 }
-export function PlayPage({ id, onAccount, onMembership }: { id: string; onAccount:()=>void; onMembership:()=>void }) {
-  const drama=dramas.find(item=>item.id===id);
-  const logo=useRef<HTMLImageElement>(null);
-  const [episode,setEpisode]=useState(0);
-  useEffect(()=>{try{sessionStorage.setItem('aiai:intro-seen','yes');}catch{/* optional */}document.title=drama?`${drama.title} · 爱爱短剧`:'未找到短剧 · 爱爱短剧';document.querySelector<HTMLElement>('.play-page h1')?.focus({preventScroll:true});},[drama]);
-  const episodes=drama?.media?.episodes?.filter(item=>item.id && item.title)??[];
-  const sources=(episodes.length?episodes[episode]?.sources:drama?.media?.sources)?.filter(source=>source.src.trim())??[];
-  return <><Header logoRef={logo} onAccount={onAccount} onMembership={onMembership} /><main className="play-page container">
-    <Link className="back-link" href="/" restoreHome><ArrowLeft size={17}/>返回首页</Link>
-    {drama ? <><div className="play-heading"><span className="eyebrow">爱爱短剧 / STORY THEATER</span><h1 tabIndex={-1}>{drama.title}</h1><p>{drama.tagline}</p></div>
-      <div className="play-layout"><section className="play-main" aria-label="播放区域">
-        {sources.length ? <VideoPlayer key={`${id}-${episode}`} sources={sources} title={drama.title}/> : <div className="no-source"><div className="no-source-poster"><Poster drama={drama} priority /></div><div className="no-source-copy"><span className="status-label"><Film size={16}/>片源待接入</span><h2>该短剧暂未配置视频源</h2><p>暂时还不能播放，可以先去发现其他故事。</p><Link href="/" restoreHome className="primary-button">继续发现好故事<ArrowLeft size={16}/></Link></div></div>}
-        {episodes.length>0 && <section className="episode-panel" aria-label="选集"><h2>选集 <small>{episodes.length} 集</small></h2><div>{episodes.map((item,i)=><button key={item.id} aria-pressed={episode===i} onClick={()=>setEpisode(i)}>{item.title}</button>)}</div></section>}
-      </section><aside className="story-panel"><span className="eyebrow">关于这部故事</span><h2>{drama.title}</h2><span className="genre-badge">{drama.genre}</span><p>{drama.synopsis}</p><small>题材与简介为演示资料，以正式作品信息为准。</small></aside></div>
-    </> : <section className="not-found"><Film size={42}/><span className="eyebrow">STORY NOT FOUND</span><h1 tabIndex={-1}>没有找到这部短剧</h1><p>链接可能有误，或该作品尚未收录。</p><Link href="/#home" className="primary-button">返回首页</Link></section>}
-  </main><Footer/></>;
+function WatchPage({drama,adult,items}:{drama:Content;adult:boolean;items:Content[]}){
+ const{navigate}=useRouter(),account=useSyncExternalStore(accountService.subscribe,accountService.getSnapshot),stored=useRecords();
+ const[episode,setEpisode]=useState(0),[group,setGroup]=useState(0),[expanded,setExpanded]=useState(false),[playing,setPlaying]=useState(false),[dialog,setDialog]=useState(''),[copied,setCopied]=useState('');
+ const demos=useMemo(()=>demoEpisodes(drama,adult&&accessService.isGranted()),[drama,adult]);const isDemo=demos.length>0;
+ const formal=drama.format==='article'?[]:playableEpisodes(drama.media);const episodes=isDemo?demos:formal;
+ const current=episodes[episode],context=adult?adultContext:greenContext,decision=playbackDecision(drama,context);
+ const allowed=isDemo?!!demos[episode]&&demoUnlocked(demos[episode],account.tier):decision.allowed;
+ const sources=isDemo?current?.sources??[]:usableSources(formal.length?current?.sources:drama.media?.sources);
+ useEffect(()=>{if(isDemo&&demos[episode]&&!demoUnlocked(demos[episode],account.tier)){setEpisode(0);setGroup(0);setPlaying(false);}},[account.tier,demos,episode,isDemo]);
+ const choose=(next:number)=>{if(next<0||next>=episodes.length)return;if(isDemo&&!demoUnlocked(demos[next],account.tier)){setDialog(demos[next].tier==='premium'?'本集需要高级会员权益':'本集需要基础会员权益');return;}setEpisode(next);setGroup(Math.floor(next/demoPlayback.groupSize));setPlaying(false);};
+ const back=()=>{const origin=history.state?.playOrigin;if(typeof origin==='string'&&/^\/(?:$|\?|#|shorts(?:[?#]|$)|comics(?:[?#]|$)|free(?:[?#]|$)|search(?:[?#]|$)|collections(?:[/?#]|$)|me(?:[?#]|$)|18plus(?:[/?#]|$))/.test(origin)&&!origin.startsWith('//'))history.back();else navigate('/#home');};
+ const favorite=adult?stored.wishlist.includes(drama.id):stored.green.includes(drama.id);
+ const toggleFavorite=()=>{if(adult)records.toggleWishlist(drama.id);else if(favorite)records.remove('green',drama.id);else records.add('green',drama.id);};
+ const copy=async()=>{if(adult){setCopied('私密内容不提供公开分享。');return;}try{await navigator.clipboard.writeText(`${location.origin}/play/${encodeURIComponent(drama.id)}`);setCopied('链接已复制');}catch{setCopied('复制未完成，请手动复制浏览器地址。');}};
+ const groupCount=Math.ceil(episodes.length/demoPlayback.groupSize);
+ return <main className="watch-page container"><Breadcrumb current={drama.title}/><div className="watch-layout"><section className="watch-media" aria-label="播放区域">
+ {allowed&&sources.length?<VideoPlayer key={`${drama.id}-${episode}`} custom sources={sources} title={`${drama.title} 第${episode+1}集`} onBack={back} onPrevious={()=>choose(episode-1)} onNext={()=>choose(episode+1)} previousDisabled={episode===0} nextDisabled={episode>=episodes.length-1} onPlaybackChange={setPlaying}/>:<div className="watch-unavailable"><button className="text-button" onClick={back}>返回上一列表</button><EmptyState title="暂时无法播放" description={isDemo?'当前会员权益不包含此集。':decision.reason}/></div>}
+ </section><aside className="watch-info" tabIndex={0} aria-label="作品信息与选集"><h1>{drama.title} {episodes.length>0&&<span>第{episode+1}集</span>}</h1><div className="watch-actions"><button aria-pressed={favorite} onClick={toggleFavorite}><Heart size={18} fill={favorite?'currentColor':'none'}/>{favorite?'已收藏':'收藏'}</button><button onClick={()=>setDialog('评论功能暂未开放')}><MessageCircle size={18}/>评论</button></div><div className="tag-row"><span className="genre-badge">{drama.genre}</span></div>
+ {drama.synopsis&&<section className="watch-synopsis"><h2>剧情简介</h2><p className={expanded?'':'collapsed'}>{drama.synopsis}</p>{drama.synopsis.length>65&&<button className="text-button" aria-expanded={expanded} onClick={()=>setExpanded(!expanded)}>{expanded?'收起':'展开'}{expanded?<ChevronUp size={16}/>:<ChevronDown size={16}/>}</button>}</section>}
+ <div className="watch-share">{adult?<span>私密内容不提供公开分享</span>:<button className="secondary-button" onClick={()=>void copy()}><Copy size={16}/>复制链接</button>}<span role="status">{copied}</span></div>
+ {episodes.length>0&&<section className="watch-episodes" aria-label="剧集列表"><div className="episode-heading"><h2>剧集列表</h2><span>{episodes.length} 集</span></div>{groupCount>1&&<div className="episode-groups" aria-label="剧集范围">{Array.from({length:groupCount},(_,g)=><button key={g} aria-pressed={g===group} onClick={()=>setGroup(g)}>{g*demoPlayback.groupSize+1}–{Math.min((g+1)*demoPlayback.groupSize,episodes.length)}</button>)}</div>}
+ <div className="episode-grid">{episodes.slice(group*demoPlayback.groupSize,(group+1)*demoPlayback.groupSize).map((item,i)=>{const index=group*demoPlayback.groupSize+i,locked=isDemo&&!demoUnlocked(demos[index],account.tier);return <button key={item.id} className={locked?'episode-locked':''} aria-label={`第${index+1}集${locked?'，需'+(demos[index].tier==='basic'?'基础':'高级')+'会员权益':''}`} aria-current={index===episode?'true':undefined} onClick={()=>choose(index)}>{index===episode&&playing?<AudioLines size={15}/>:null}<span>{index+1}</span>{locked&&<Lock size={11}/>}</button>;})}</div>
+ {isDemo&&<div className="demo-account"><label>账户权益<select aria-label="账户权益" value={account.tier} onChange={e=>accountService.setPreview({tier:e.target.value as Tier})}><option value="free">免费</option><option value="basic">基础</option><option value="premium">高级</option></select></label><small>免费 1–6 集 · 基础 1–30 集 · 高级全部 36 集。</small></div>}
+ </section>}
+ </aside></div><div className="related-content"><DramaGrid id="related" title="继续发现" subtitle="仅推荐当前内容范围内的作品" items={contentService.recommendations(items,context,drama.id)}/></div>{dialog&&<DialogShell title={dialog} onClose={()=>setDialog('')}>{dialog.startsWith('本集')&&<p>请在选集下方检查当前账户权益。</p>}</DialogShell>}</main>;
 }

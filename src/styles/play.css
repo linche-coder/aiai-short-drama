@@ -6,17 +6,18 @@
 .card-info p{font-size:11px;line-height:1.5;color:#d6c2d8;margin:0;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
 .info-genre{color:#d2b6d6;font-size:11px}.watch-cue{display:flex;align-items:center;justify-content:space-between;color:#fff0f5;font-size:13px;font-weight:500;gap:22px}.watch-cue svg{color:#ffafc9}
 .banner-info{height:33%;max-height:40%;padding:28px 23px 20px;gap:6px}.banner-info .watch-cue{margin-top:5px;color:#ffc0d4}.catalog-info .watch-cue{font-size:13px}
-.drama-card:is(:hover,:focus-visible) .card-info{opacity:1;transform:none}
+.drama-card:focus-visible .card-info{opacity:1;transform:none}
 .hero-surface{display:block}.hero-cover,.poster-edge,.featured-badge,.cover-shade{pointer-events:none}
-.hero[data-motion="idle"][data-window-active="true"] .hero-poster:has(.hero-surface:focus-visible){z-index:6}
-.hero[data-motion="idle"][data-window-active="true"] .hero-surface:focus-visible .card-info{opacity:1;transform:none}
-.hero[data-motion="idle"][data-window-active="true"] .hero-surface:focus-visible .cover-shade{opacity:0}
+.hero[data-motion="idle"][data-window-active="true"] .hero-poster[data-outer="false"] .hero-surface:focus-visible .card-info{opacity:1;transform:none}
+.hero[data-motion="idle"][data-window-active="true"] .hero-poster[data-outer="false"] .hero-surface:focus-visible .cover-shade{opacity:0}
 .hero-poster[data-wrap]{pointer-events:none;z-index:2}
 @media(hover:hover) and (pointer:fine){
-  .hero[data-motion="idle"][data-pointer-ready="true"][data-window-active="true"] .hero-poster:has(.hero-surface:hover){z-index:6}
-  .hero[data-motion="idle"][data-pointer-ready="true"][data-window-active="true"] .hero-surface:hover .card-info{opacity:1;transform:none}
-  .hero[data-motion="idle"][data-pointer-ready="true"][data-window-active="true"] .hero-surface:hover .cover-shade{opacity:0}
+  .drama-card:hover .card-info{opacity:1;transform:none}
+  .hero[data-motion="idle"][data-pointer-ready="true"][data-window-active="true"] .hero-poster[data-outer="false"] .hero-surface:hover .card-info{opacity:1;transform:none}
+  .hero[data-motion="idle"][data-pointer-ready="true"][data-window-active="true"] .hero-poster[data-outer="false"] .hero-surface:hover .cover-shade{opacity:0}
 }
+/* Entering an outer slot immediately discards previous hover feedback. */
+.hero-poster[data-outer="true"] .card-info,.hero-poster[data-outer="true"] .cover-shade{transition:none}
 @media(max-width:1199px){.hero-poster.offset-2,.hero-poster.offset--2{display:none}}
 @media(hover:none){.hero[data-motion="idle"] .offset-0 .card-info{opacity:1;transform:none}}
 @media(max-width:540px){.banner-info{height:32%;padding:20px 16px 15px;gap:5px}.card-info h2{font-size:16px}.banner-info p{display:none}.watch-cue,.catalog-info .watch-cue{font-size:12px}.catalog-info{padding:16px}.info-genre{font-size:10px}}

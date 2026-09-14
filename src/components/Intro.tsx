@@ -22,7 +22,7 @@ export function Intro({ logoRef, reduced, full, onDone }: { logoRef: RefObject<H
     let movement: Animation | undefined;
     let resizeFlight: Animation | undefined;
     const finish = () => { if (!disposed && !completed) { completed = true; onDone(); } };
-    const safety = window.setTimeout(finish, full && !reduced ? 4500 : 700);
+    const safety = window.setTimeout(finish, full && !reduced ? timing.intro + 500 : timing.reducedIntro + 480);
     const animate = (element: Element | null | undefined, frames: Keyframe[], at: number, duration: number, easing = 'cubic-bezier(.22,1,.36,1)') => {
       if (!element) return undefined;
       const animation = element.animate(frames, { delay: at, duration, easing, fill: 'both' });
@@ -30,6 +30,7 @@ export function Intro({ logoRef, reduced, full, onDone }: { logoRef: RefObject<H
       animations.push(animation);
       return animation;
     };
+    const afterDeparture = (offset: number) => timing.logoMoveAt + offset;
     const fade = (selector: string, at: number, duration: number) => document.querySelectorAll(selector).forEach(el => animate(el, [{ opacity: 0 }, { opacity: 1 }], at, duration));
     const rectangleFrames = (a: DOMRect, b: DOMRect): Keyframe[] => {
       const x = b.x - a.x, y = b.y - a.y, scale = b.width / a.width;
@@ -84,21 +85,21 @@ export function Intro({ logoRef, reduced, full, onDone }: { logoRef: RefObject<H
         animate(el.querySelector('.brand-sheen'), [{ opacity: 0 }, { opacity: .48, offset: .42 }, { opacity: .2, offset: .7 }, { opacity: 0 }], 160, 1770, 'ease-in-out');
         animate(el.querySelector('.brand-light'), [{ transform: 'translate(-130px,35px) rotate(-18deg)' }, { transform: 'translate(360px,-25px) rotate(-18deg)' }], 160, 1770, 'cubic-bezier(.35,0,.25,1)');
         movement = animate(el, rectangleFrames(el.getBoundingClientRect(), logoRef.current!.getBoundingClientRect()), timing.logoMoveAt, timing.logoMoveDuration, 'cubic-bezier(.45,0,.18,1)');
-        fade('.header-inner > :not(.brand)', 2550, 500);
-        fade('.hero-ambience', 2550, 850);
+        fade('.header-inner > :not(.brand)', afterDeparture(450), 500);
+        fade('.hero-ambience', afterDeparture(450), 850);
         document.querySelectorAll('.hero-poster').forEach(poster => {
           const active = poster.classList.contains('offset-0');
-          animate(poster.querySelector('.hero-surface'), [{ opacity: 0, transform: `translateY(${active ? 18 : 26}px) scale(.97)` }, { opacity: 1, transform: 'none' }], active ? 2600 : 2770, active ? 700 : 730);
+          animate(poster.querySelector('.hero-surface'), [{ opacity: 0, transform: `translateY(${active ? 18 : 26}px) scale(.97)` }, { opacity: 1, transform: 'none' }], afterDeparture(active ? 500 : 670), active ? 700 : 730);
         });
-        fade('.carousel-controls', 3200, 500);
-        fade('.carousel-arrow', 3200, 500);
+        fade('.carousel-controls', afterDeparture(1100), 500);
+        fade('.carousel-arrow', afterDeparture(1100), 500);
         document.querySelectorAll('.content > *, .drama-card').forEach(element => {
           const rect = element.getBoundingClientRect();
-          if (rect.top < innerHeight && rect.bottom > 0) animate(element, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], 3250, 550);
+          if (rect.top < innerHeight && rect.bottom > 0) animate(element, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], afterDeparture(1150), 550);
         });
         // All phase animations share this timeline origin. Normal completion is
         // driven by this animation's finished Promise, never by a normal timer.
-        const master = animate(root.current!.querySelector('.intro-curtain'), [{ opacity: 1, offset: 0 }, { opacity: 1, offset: 2550 / timing.intro }, { opacity: 0, offset: 3500 / timing.intro }, { opacity: 0, offset: 1 }], 0, timing.intro, 'linear');
+        const master = animate(root.current!.querySelector('.intro-curtain'), [{ opacity: 1, offset: 0 }, { opacity: 1, offset: afterDeparture(450) / timing.intro }, { opacity: 0, offset: afterDeparture(1400) / timing.intro }, { opacity: 0, offset: 1 }], 0, timing.intro, 'linear');
         master?.finished.then(async () => { await resizeFlight?.finished.catch(() => {}); finish(); }, () => {});
         window.addEventListener('resize', onResize);
       }
