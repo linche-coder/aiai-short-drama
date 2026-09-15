@@ -57,7 +57,7 @@ export function AdultPage(){
  </div>;
  return <main className="adult-main">
   {data.loading?<div className="container"><LoadingState/></div>:data.error?<div className="container"><ErrorState message={data.error} retry={data.retry}/></div>:<>
-   {home&&<AdultHero items={data.items.slice(0,6)}/>}
+   {home&&<AdultHero/>}
    <div className="container adult-body">
     {home&&history.length>0&&<AdultCards id="adult-history" title="继续观看" items={history}/>}
     <AdultCards items={home?data.items.slice(0,columns):paged} title={home?"精选推荐":title} controls={home?undefined:filters} reset={reset}/>
