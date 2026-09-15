@@ -101,10 +101,10 @@
 .brand-with-zone>a{display:flex;align-items:center;flex-shrink:0}.brand-zone-link{min-height:44px}.brand-zone-link:focus-visible{outline:2px solid #f0abc0;outline-offset:3px;border-radius:7px}
 
 /* The three supplied banners contain their own titles and artwork. */
-.adult-shell .adult-cinema-artwork{width:100%;height:min(50vw,880px);aspect-ratio:auto;max-height:none}
+.adult-shell .adult-cinema-artwork{background:#100b10;width:100%;height:min(50vw,880px);aspect-ratio:auto;max-height:none}
 .adult-shell .adult-cinema-artwork .adult-cinema-art{inset:0;width:100%;height:100%}
-.adult-shell .adult-cinema-artwork .adult-cinema-subject{inset:0 auto 0 50%;width:min(100%,1760px);height:100%;max-width:none;aspect-ratio:auto;object-fit:contain;object-position:center;transform:translateX(-50%);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
-.adult-shell .adult-cinema-artwork .adult-cinema-extension{inset:-48px;background-position:center;background-size:cover;filter:blur(64px);opacity:.4}
+.adult-shell .adult-cinema-artwork .adult-cinema-subject{inset:0 auto 0 50%;width:min(100%,1760px);height:100%;max-width:none;aspect-ratio:auto;object-fit:contain;object-position:center;transform:translateX(-50%);mask-image:linear-gradient(90deg,transparent,#000 16%,#000 84%,transparent)}
+.adult-shell .adult-cinema-artwork .adult-cinema-extension{display:none}
 .adult-shell .adult-cinema-artwork .adult-cinema-shade{background:linear-gradient(0deg,#100b10e8,transparent 62%),linear-gradient(90deg,#100b1080,transparent 55%);pointer-events:none}
 .adult-shell .adult-cinema-artwork .adult-cinema-content{position:absolute;inset:0;justify-content:space-between;padding-block:32px;pointer-events:none}
 .adult-shell .adult-cinema-artwork .adult-cinema-picker{pointer-events:auto;width:320px}
@@ -135,3 +135,6 @@
  .adult-shell .adult-cinema-artwork .adult-cinema-thumb{width:80px;min-width:80px}
  .adult-shell .adult-cinema-artwork .adult-cinema-subject{mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
 }
+
+.adult-banner-playback-empty{display:grid;justify-items:center;text-align:center;padding:28px 16px;background:#100b10;border-radius:10px;margin-bottom:22px;color:#cebcc6}
+.adult-banner-playback-empty p{margin:12px 0 0}

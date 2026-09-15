@@ -1,5 +1,5 @@
 ﻿import {useEffect,useRef,useState} from 'react';
-import {ChevronLeft,ChevronRight,Pause,Play,ArrowRight} from 'lucide-react';
+import {ChevronLeft,ChevronRight,Pause,Play} from 'lucide-react';
 import {useReducedMotion} from '../hooks/useReducedMotion';
 import {EmptyState} from '../components/content/PageParts';
 
@@ -25,12 +25,12 @@ export function AdultHero() {
   </div>
   <div className="adult-cinema-shade"/>
   <div className="container adult-cinema-content">
-   <div className="adult-cinema-copy" key={item.id}><span className="adult-eyebrow">今夜精选 · {item.genre}</span><h1>{item.title}</h1><p>{item.synopsis}</p><button className="primary-button" onClick={()=>details.current?.showModal()}>作品简介<ArrowRight size={18}/></button></div>
+   <div className="adult-cinema-copy" key={item.id}><span className="adult-eyebrow">今夜精选 · {item.genre}</span><h1>{item.title}</h1><p>{item.synopsis}</p><button className="primary-button" onClick={()=>details.current?.showModal()}><Play size={18} fill="currentColor"/>立即播放</button></div>
    {items.length>1&&<div className="adult-cinema-picker">
     <div className="adult-cinema-thumbnails" ref={thumbnails} aria-label="推荐作品选择">{items.map((c,i)=><button className="adult-cinema-thumb" key={c.id} aria-label={`切换推荐：${c.title}`} aria-pressed={i===position} onClick={()=>setIndex(i)}><img src={c.image} alt="" style={{objectPosition:c.focus}} decoding="async"/><span className="adult-cinema-thumb-title">{c.title}</span></button>)}</div>
     <div className="adult-cinema-controls"><span className="adult-cinema-count" aria-live="off">{String(position+1).padStart(2,'0')} <i>/ {String(items.length).padStart(2,'0')}</i></span><span className="adult-cinema-meter" aria-hidden="true"><span style={{width:`${(position+1)/items.length*100}%`}}/></span><button aria-label="上一部" onClick={()=>move(-1)}><ChevronLeft size={19}/></button>{!reduced&&<button aria-label={manual?'继续自动切换':'暂停自动切换'} aria-pressed={manual} onClick={()=>setManual(!manual)}>{manual?<Play size={16}/>:<Pause size={16}/>}</button>}<button aria-label="下一部" onClick={()=>move(1)}><ChevronRight size={19}/></button></div>
    </div>}
   </div>
-  <dialog ref={details} className="adult-banner-detail" aria-labelledby="banner-detail-title"><span className="adult-eyebrow">{item.genre}</span><h2 id="banner-detail-title">{item.title}</h2><p>{item.synopsis}</p><form method="dialog"><button className="secondary-button">关闭</button></form></dialog>
+  <dialog ref={details} className="adult-banner-detail" aria-labelledby="banner-detail-title"><span className="adult-eyebrow">{item.genre}</span><h2 id="banner-detail-title">{item.title}</h2><p>{item.synopsis}</p><div className="adult-banner-playback-empty" role="status"><Play size={32}/><p>该作品暂未上线，敬请期待。</p></div><form method="dialog"><button className="secondary-button">关闭</button></form></dialog>
  </section>;
 }
