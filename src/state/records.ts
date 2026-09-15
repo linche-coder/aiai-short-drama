@@ -7,11 +7,12 @@ let state:RecordsState={privacy:{hideGreen:false,hideAdult:true,neutralNotificat
 const listeners=new Set<()=>void>();
 const emit=(patch:Partial<RecordsState>)=>{state={...state,...patch,revision:state.revision+1};for(const fn of listeners)fn();};
 const channel=typeof window!=='undefined'&&typeof BroadcastChannel!=='undefined'?new BroadcastChannel('aiai:local-records'):null;
-channel?.addEventListener('message',e=>{if(e.data==='clear-private')emit({adult:[],wishlist:[],reservations:[]});if(e.data==='clear-green')emit({green:[]});});
+channel?.addEventListener('message',e=>{if(e.data==='clear-private-history')emit({adult:[]});if(e.data==='clear-private')emit({adult:[],wishlist:[],reservations:[]});if(e.data==='clear-green')emit({green:[]});});
 export const records={subscribe(fn:()=>void){listeners.add(fn);return()=>{listeners.delete(fn);};},getSnapshot:()=>state,
  setPrivacy(patch:Partial<Privacy>){emit({privacy:{...state.privacy,...patch,adultNotifications:false}});},
  add(zone:ContentZone,id:string){if(zone==='adult'&&!accessService.isGranted())return;emit({[zone]:[id,...state[zone].filter(v=>v!==id)]});},
  toggleWishlist(id:string){if(!accessService.isGranted())return;const removing=state.wishlist.includes(id);emit({wishlist:removing?state.wishlist.filter(v=>v!==id):[...state.wishlist,id],reservations:removing?state.reservations.filter(v=>v!==id):state.reservations});},
+ clearAdultHistory(){emit({adult:[]});channel?.postMessage('clear-private-history');},
  reserve(id:string){if(!accessService.isGranted())return;emit({reservations:[...new Set([...state.reservations,id])]});},
  remove(zone:ContentZone,id:string){emit({[zone]:state[zone].filter(v=>v!==id)});},
  clear(zone:ContentZone){emit(zone==='adult'?{adult:[],wishlist:[],reservations:[]}:{green:[]});channel?.postMessage(zone==='adult'?'clear-private':'clear-green');},

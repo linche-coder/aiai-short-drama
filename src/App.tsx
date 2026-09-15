@@ -1,8 +1,9 @@
+import {accessService} from './services/access';
 ﻿import{lazy,Suspense,useEffect,useRef,useState}from'react';
 import{Router,useRouter}from'./navigation/Router';import{HomePage}from'./HomePage';import{Header}from'./components/Header';import{Footer}from'./components/Footer';import{Modal}from'./components/Modal';import{PlayPage}from'./components/PlayPage';import{CatalogPage,CollectionsPage,RankingsPage}from'./pages/CatalogPages';import{AdultBoundary,AdultPage,AdultSearch,WishlistPage}from'./pages/AdultPages';import{MembershipPage}from'./pages/MembershipPage';import{MePage,OrdersPage,PrivacyPage}from'./pages/AccountPages';import{NotFound,LoadingState}from'./components/content/PageParts';import{Link}from'./navigation/Router';
 const AdminPage=import.meta.env.DEV?lazy(()=>import('./dev/AdminPage')):null;
 const PreviewControls=import.meta.env.DEV?lazy(()=>import('./dev/PreviewControls')):null;
-function Pages(){const{route}=useRouter(),[account,setAccount]=useState(false),logo=useRef<HTMLImageElement>(null);useEffect(()=>{setAccount(false);if(route.path.startsWith('/18plus'))document.title='爱爱短剧 · 访问确认';else if(!route.path.startsWith('/play/'))document.title='爱爱短剧 · 好故事，一眼入戏';},[route.key,route.path]);const onAccount=()=>setAccount(true);
+function Pages(){const{route}=useRouter(),[account,setAccount]=useState(false),logo=useRef<HTMLImageElement>(null);useEffect(()=>{setAccount(false);if(route.path.startsWith('/18plus')&&!accessService.isConfirmed())document.title='爱爱短剧 · 访问确认';else if(!route.path.startsWith('/18plus')&&!route.path.startsWith('/play/'))document.title='爱爱短剧 · 好故事，一眼入戏';},[route.key,route.path]);const onAccount=()=>setAccount(true);
  let page:React.ReactNode;const play=route.path.match(/^\/(play|read)\/([^/]+)$/),privatePlay=route.path.match(/^\/18plus\/play\/([^/]+)$/),collection=route.path.match(/^\/collections\/([^/]+)$/);const decode=(id:string)=>{try{return decodeURIComponent(id);}catch{return '';}};
  const needsAdult=route.path.startsWith('/18plus')||(route.path==='/membership'&&route.params.get('context')==='adult')||!!(play&&/^private-preview-|^legacy-adult-preview$/.test(decode(play[2])));
  if(route.path==='/')return <><HomePage key={route.key} onAccount={onAccount} blocked={account}/>{account&&<Modal content={{kind:'account'}} onClose={()=>setAccount(false)}/>}</>;
@@ -21,6 +22,7 @@ function Pages(){const{route}=useRouter(),[account,setAccount]=useState(false),l
  else if(route.path==='/me/orders')page=<OrdersPage/>;
  else if(route.path==='/admin/content'||route.path==='/admin/analytics')page=AdminPage?<Suspense fallback={<LoadingState/>}><AdminPage analytics={route.path==='/admin/analytics'}/></Suspense>:<NotFound/>;
  else page=<NotFound/>;
- return <div className="app">{route.path.startsWith('/admin')?<header className="admin-header container"><Link className="brand" href="/me"><img src="/assets/brand/logo.svg" alt="爱爱短剧"/></Link><span>管理工作台</span><Link className="text-button" href="/me">返回用户端</Link></header>:<Header logoRef={logo} onAccount={onAccount}/>}<div key={route.path}>{needsAdult?<AdultBoundary key={route.key}>{page}</AdultBoundary>:page}</div><Footer/>{account&&<Modal content={{kind:'account'}} onClose={()=>setAccount(false)}/>}</div>;
+ if(needsAdult)return <AdultBoundary>{page}</AdultBoundary>;
+ return <div className="app">{route.path.startsWith('/admin')?<header className="admin-header container"><Link className="brand" href="/me"><img src="/assets/brand/logo.svg" alt="爱爱短剧"/></Link><span>管理工作台</span><Link className="text-button" href="/me">返回用户端</Link></header>:<Header logoRef={logo} onAccount={onAccount}/>}<div key={route.path}>{needsAdult?<AdultBoundary>{page}</AdultBoundary>:page}</div><Footer/>{account&&<Modal content={{kind:'account'}} onClose={()=>setAccount(false)}/>}</div>;
 }
 export default function App(){return <Router><Pages/></Router>;}

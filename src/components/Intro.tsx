@@ -1,6 +1,7 @@
 import { useId, useLayoutEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
 import { timing } from '../config';
+import { startIntroSound } from '../motion/introSound';
 import groupedLogo from '../assets/intro-logo.svg?raw';
 
 export function Intro({ logoRef, reduced, full, onDone }: { logoRef: RefObject<HTMLImageElement | null>; reduced: boolean; full: boolean; onDone: () => void }) {
@@ -17,11 +18,12 @@ export function Intro({ logoRef, reduced, full, onDone }: { logoRef: RefObject<H
     document.body.style.overflow = 'hidden';
     const animations: Animation[] = [];
     const start = Number(document.timeline.currentTime ?? performance.now());
+    const stopSound = full && !reduced ? startIntroSound(start) : () => {};
     let disposed = false;
     let completed = false;
     let movement: Animation | undefined;
     let resizeFlight: Animation | undefined;
-    const finish = () => { if (!disposed && !completed) { completed = true; onDone(); } };
+    const finish = () => { if (!disposed && !completed) { completed = true; stopSound(); onDone(); } };
     const safety = window.setTimeout(finish, full && !reduced ? timing.intro + 500 : timing.reducedIntro + 480);
     const animate = (element: Element | null | undefined, frames: Keyframe[], at: number, duration: number, easing = 'cubic-bezier(.22,1,.36,1)') => {
       if (!element) return undefined;
@@ -104,7 +106,7 @@ export function Intro({ logoRef, reduced, full, onDone }: { logoRef: RefObject<H
         window.addEventListener('resize', onResize);
       }
     } catch { finish(); }
-    return () => { disposed = true; clearTimeout(safety); window.removeEventListener('resize', onResize); animations.forEach(a => a.cancel()); document.body.style.overflow = previous; };
+    return () => { disposed = true; stopSound(); clearTimeout(safety); window.removeEventListener('resize', onResize); animations.forEach(a => a.cancel()); document.body.style.overflow = previous; };
   }, [full, reduced, logoRef, onDone]);
   return <div ref={root} className={`intro ${reduced || !full ? 'intro-short' : ''}`} aria-hidden="true"><div className="intro-curtain" />{full && !reduced && <div ref={floating} className="intro-logo"><div className="intro-svg" dangerouslySetInnerHTML={{ __html: markup }} /></div>}</div>;
 }
