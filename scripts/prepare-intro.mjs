@@ -1,0 +1,10 @@
+import fs from 'node:fs/promises';
+const original = await fs.readFile('public/assets/brand/logo.svg', 'utf8');
+const paths = [...original.matchAll(/<path\b[\s\S]*?\/>/g)].map(m => m[0]);
+if (paths.length !== 6 || !paths[5].includes('fill="white"')) throw Error('Unexpected original logo');
+const defs = original.match(/<defs>([\s\S]*?)<\/defs>/)[1];
+const maskPath = paths[2].replace(/fill="[^"]*"/, 'fill="white"');
+const effects = `<radialGradient id="brand-aura"><stop stop-color="#FE882B" stop-opacity=".85"/><stop offset=".35" stop-color="#FC2F5E" stop-opacity=".65"/><stop offset=".65" stop-color="#A931F3" stop-opacity=".28"/><stop offset="1" stop-color="#A931F3" stop-opacity="0"/></radialGradient><linearGradient id="brand-light"><stop stop-color="#FE882B" stop-opacity="0"/><stop offset=".35" stop-color="#FFAD68" stop-opacity=".3"/><stop offset=".5" stop-color="#FF7CAB" stop-opacity=".9"/><stop offset=".7" stop-color="#BB70EF" stop-opacity=".3"/><stop offset="1" stop-color="#BB70EF" stop-opacity="0"/></linearGradient><mask id="brand-heart-mask" maskUnits="userSpaceOnUse" x="0" y="60" width="280" height="235">${maskPath}</mask>`;
+const grouped = `<svg viewBox="0 0 1000 301" fill="none" xmlns="http://www.w3.org/2000/svg"><defs>${defs}${effects}</defs><g class="brand-icon"><ellipse class="intro-glow" cx="140" cy="155" rx="210" ry="190" fill="url(#brand-aura)"/><g class="brand-hearts">${paths.slice(2,5).join('')}<g class="brand-sheen" mask="url(#brand-heart-mask)"><rect class="brand-light" x="-100" y="30" width="160" height="300" fill="url(#brand-light)"/></g></g><g class="brand-dot brand-dot-left">${paths[0]}</g><g class="brand-dot brand-dot-right">${paths[1]}</g></g><g class="brand-wordmark">${paths[5]}</g></svg>`;
+await fs.writeFile('src/assets/intro-logo.svg', grouped);
+console.log('Six unchanged brand paths, original-path mask, local radial aura and soft gradient sweep.');
