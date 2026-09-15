@@ -103,12 +103,12 @@
 /* The three supplied banners contain their own titles and artwork. */
 .adult-shell .adult-cinema-artwork{width:100%;height:min(50vw,880px);aspect-ratio:auto;max-height:none}
 .adult-shell .adult-cinema-artwork .adult-cinema-art{inset:0;width:100%;height:100%}
-.adult-shell .adult-cinema-artwork .adult-cinema-subject{inset:0 auto 0 50%;width:min(100%,1760px);height:100%;max-width:none;aspect-ratio:auto;object-fit:contain;object-position:center;transform:translateX(-50%);mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
-.adult-shell .adult-cinema-artwork .adult-cinema-extension{inset:-48px;background-position:center;background-size:cover;filter:blur(40px);opacity:.65}
-.adult-shell .adult-cinema-artwork .adult-cinema-shade{background:linear-gradient(0deg,#100b10bb,transparent 24%);pointer-events:none}
-.adult-shell .adult-cinema-artwork .adult-cinema-content{position:absolute;inset:0;justify-content:flex-end;padding-block:18px;pointer-events:none}
+.adult-shell .adult-cinema-artwork .adult-cinema-subject{inset:0 auto 0 50%;width:min(100%,1760px);height:100%;max-width:none;aspect-ratio:auto;object-fit:contain;object-position:center;transform:translateX(-50%);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.adult-shell .adult-cinema-artwork .adult-cinema-extension{inset:-48px;background-position:center;background-size:cover;filter:blur(64px);opacity:.4}
+.adult-shell .adult-cinema-artwork .adult-cinema-shade{background:linear-gradient(0deg,#100b10e8,transparent 62%),linear-gradient(90deg,#100b1080,transparent 55%);pointer-events:none}
+.adult-shell .adult-cinema-artwork .adult-cinema-content{position:absolute;inset:0;justify-content:space-between;padding-block:32px;pointer-events:none}
 .adult-shell .adult-cinema-artwork .adult-cinema-picker{pointer-events:auto;width:320px}
-.adult-shell .adult-cinema-artwork .adult-cinema-thumb{width:88px;min-width:88px;aspect-ratio:2/1}
+.adult-shell .adult-cinema-artwork .adult-cinema-thumb{position:relative;width:96px;min-width:96px;aspect-ratio:3/4}
 .adult-shell .adult-cinema-artwork .adult-cinema-thumb img{display:block;width:100%;height:100%;object-fit:cover}
 .adult-shell .adult-cinema-artwork .adult-cinema-controls{border-radius:24px;background:#100b10c9;padding:4px 8px}
 @media(max-width:760px){
@@ -118,4 +118,20 @@
  .adult-shell .adult-cinema-artwork .adult-cinema-picker{width:100%;max-width:100%}
  .adult-shell .adult-cinema-artwork .adult-cinema-thumbnails{justify-content:center}
  .adult-shell .adult-cinema-artwork .adult-cinema-shade{display:none}
+}
+
+.adult-shell .adult-cinema-artwork .adult-cinema-copy{pointer-events:auto;padding-bottom:0;max-width:560px;width:46%}
+.adult-shell .adult-cinema-artwork .adult-cinema-copy h1{font-size:clamp(26px,2.5vw,44px);margin:10px 0 12px;line-height:1.3}
+.adult-shell .adult-cinema-artwork .adult-cinema-copy p{margin:0 0 20px;min-height:0;line-height:1.7;max-width:520px;text-shadow:0 1px 8px #000}
+.adult-shell .adult-cinema-artwork .adult-cinema-thumb-title{position:absolute;inset:auto 0 0;padding:18px 5px 6px;background:linear-gradient(transparent,#100b10e8);font-size:10px;line-height:1.4;color:#fff;text-align:center}
+.adult-banner-detail{width:min(520px,calc(100% - 40px));padding:28px;border:1px solid #d8b58a40;border-radius:16px;background:#20141c;color:#f3e9e7}
+.adult-banner-detail::backdrop{background:#08060bbd;backdrop-filter:blur(8px)}
+.adult-banner-detail h2{font-size:24px;margin:12px 0}
+.adult-banner-detail p{line-height:1.9;color:#cebcc6;margin:12px 0 24px}
+@media(max-width:760px){
+ .adult-shell .adult-cinema-artwork .adult-cinema-copy{width:100%;max-width:none;margin-bottom:24px}
+ .adult-shell .adult-cinema-artwork .adult-cinema-copy h1{font-size:26px}
+ .adult-shell .adult-cinema-artwork .adult-cinema-content{padding-top:16px}
+ .adult-shell .adult-cinema-artwork .adult-cinema-thumb{width:80px;min-width:80px}
+ .adult-shell .adult-cinema-artwork .adult-cinema-subject{mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
 }
