@@ -1,64 +1,65 @@
-import {timing} from '../config';
-
-export const introSound = {
-  src: '/assets/audio/aiai-intro-reveal-v4.wav',
-  // Only the opening reveal plays; the later hold, flight and landing are silent.
-  delay: 0,
-  volume: 0.65,
+﻿export const introSound = {
+  src: '/assets/audio/aiai-orbit-v1.mp3',
+  shortSrc: '/assets/audio/aiai-orbit-soft-v1.mp3',
+  volume: 0.8,
 };
 
-/** Follow the animation timeline even if loading or autoplay permission is late. */
-export function startIntroSound(timelineStart: number) {
-  const sound = new Audio(introSound.src);
-  sound.preload = 'auto';
-  sound.volume = introSound.volume;
-  let stopped = false, playing = false, pending = false;
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const elapsed = () => Number(document.timeline.currentTime ?? performance.now()) - timelineStart;
-  const attempt = () => {
-    if (stopped || playing || pending || document.hidden || sound.readyState < 2) return;
-    const offset = (elapsed() - introSound.delay) / 1000;
-    if (offset < 0) {
-      clearTimeout(timer);
-      timer = setTimeout(attempt, -offset * 1000);
-      return;
+/** Preload/decode silently. A missing buffer or delayed resume is never retried. */
+export function prepareIntroSound() {
+  const abort = new AbortController();
+  let context: AudioContext | undefined;
+  let source: AudioBufferSourceNode | undefined;
+  let gain: GainNode | undefined;
+  let closed = false, attempted = false;
+  let deadline: number | undefined;
+  const buffers = new Map<string, AudioBuffer>();
+  try {
+    context = new AudioContext({ latencyHint: 'interactive' });
+    for (const url of [introSound.src, introSound.shortSrc]) {
+      void fetch(url, { signal: abort.signal }).then(response => {
+        if (!response.ok) throw new Error('Intro audio unavailable');
+        return response.arrayBuffer();
+      }).then(bytes => closed ? undefined : context!.decodeAudioData(bytes))
+        .then(buffer => { if (buffer && !closed) buffers.set(url, buffer); }).catch(() => {});
     }
-    if (elapsed() >= timing.intro || offset >= sound.duration) return;
-    sound.currentTime = offset;
-    pending = true;
-    void sound.play().then(() => {
-      pending = false;
-      if (stopped) sound.pause();
-      else playing = true;
-    }, () => { pending = false; }); // Autoplay rejection leaves the visual timeline intact.
-  };
-  const synchronize = () => {
-    if (stopped || sound.paused) return;
-    const target = Math.max(0, (elapsed() - introSound.delay) / 1000);
-    if (target >= timing.intro / 1000 || target >= sound.duration) { stop(); return; }
-    // Catch up after buffering rather than letting sound trail the logo.
-    if (Math.abs(sound.currentTime - target) > 0.08) sound.currentTime = target;
-  };
+  } catch { /* Audio is optional. */ }
   const stop = () => {
-    stopped = true;
-    clearTimeout(timer);
-    sound.pause();
-    sound.removeEventListener('loadeddata', attempt);
-    sound.removeEventListener('playing', synchronize);
-    sound.removeEventListener('timeupdate', synchronize);
-    window.removeEventListener('pointerdown', attempt);
-    window.removeEventListener('keydown', attempt);
+    if (closed) return;
+    closed = true;
+    abort.abort();
+    window.clearTimeout(deadline);
     document.removeEventListener('visibilitychange', visibility);
-    sound.removeAttribute('src');
-    sound.load();
+    try { source?.stop(); } catch { /* Already ended. */ }
+    source?.disconnect();
+    gain?.disconnect();
+    buffers.clear();
+    if (context && context.state !== 'closed') void context.close().catch(() => {});
   };
   const visibility = () => { if (document.hidden) stop(); };
-  sound.addEventListener('loadeddata', attempt);
-  sound.addEventListener('playing', synchronize);
-  sound.addEventListener('timeupdate', synchronize);
-  window.addEventListener('pointerdown', attempt);
-  window.addEventListener('keydown', attempt);
   document.addEventListener('visibilitychange', visibility);
-  attempt();
-  return stop;
+  return {
+    start(short: boolean, clickedAt: number) {
+      if (attempted || closed || !context || document.hidden) return;
+      attempted = true;
+      // User activation reaches resume synchronously, before any await or timer.
+      try {
+        const resumed = context.resume();
+        const buffer = buffers.get(short ? introSound.shortSrc : introSound.src);
+        if (!buffer) { void resumed.catch(() => {}); stop(); return; }
+        source = context.createBufferSource();
+        gain = context.createGain();
+        gain.gain.value = introSound.volume;
+        source.buffer = buffer;
+        source.connect(gain).connect(context.destination);
+        source.onended = stop;
+        source.start(context.currentTime);
+        deadline = window.setTimeout(() => { if (context?.state !== 'running') stop(); }, 100);
+        void resumed.then(() => {
+          if (closed || performance.now() - clickedAt > 100) stop();
+          else window.clearTimeout(deadline);
+        }, stop);
+      } catch { stop(); }
+    },
+    dispose: stop,
+  };
 }

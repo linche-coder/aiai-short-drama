@@ -1,0 +1,12 @@
+{
+  "accelerate": 160,
+  "gather": 820,
+  "flightAt": 900,
+  "flight": 640,
+  "fadeAt": 940,
+  "fadeEnd": 1620,
+  "duration": 1680,
+  "audioDuration": 1620,
+  "short": 360,
+  "shortAudio": 320
+}

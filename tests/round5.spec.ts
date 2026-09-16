@@ -96,15 +96,17 @@ test('history entries retain their own filters and pending searches cannot overw
   await page.getByRole('textbox').fill('无结果输入');await page.getByRole('navigation',{name:'首页分区'}).getByText('热门推荐',{exact:true}).click();await aligned(page,'popular');await page.waitForTimeout(600);await expect(page.locator('.drama-card')).toHaveCount(12);await expect(page.getByRole('textbox')).toHaveValue('');
 });
 
-test('intro changes only full hold; cleanup, repeat policy and reduced motion work',async({page})=>{
-  expect(introPhases).toEqual({reveal:1550,hold:412,transition:1900,flight:1150});expect(timing.intro).toBe(3862);expect(timing.logoMoveAt).toBe(1962);
+test('intro waits for entry, preserves grouped reveal and cleans up after departure',async({page})=>{
+  expect(introPhases).toEqual({reveal:1550,gather:820,transition:1680,flight:640});expect(timing.intro).toBe(1680);expect(timing.logoMoveAt).toBe(900);
   await page.goto('/');await expect(page.locator('.intro .intro-logo')).toBeVisible();
   const phases=await page.evaluate(()=>document.getAnimations().map(animation=>({target:(animation.effect as KeyframeEffect).target?.getAttribute('class'),delay:animation.effect!.getTiming().delay,duration:animation.effect!.getTiming().duration})));
-  expect(phases.find(p=>p.target==='brand-wordmark')).toMatchObject({delay:900,duration:650});expect(phases.find(p=>p.target==='brand-icon')).toMatchObject({delay:850,duration:700});expect(phases.find(p=>p.target==='intro-logo')).toMatchObject({delay:1962,duration:1150});
-  await fs.writeFile(`${out}/intro-timing.json`,JSON.stringify({before:{reveal:1550,hold:412,departure:1962,flight:1150,total:3862},after:{...introPhases,departure:timing.logoMoveAt,total:timing.intro},phases},null,2));
-  await expect(page.locator('.intro')).toHaveCount(0,{timeout:5000});await expect(page.locator('.app')).not.toHaveAttribute('inert');expect(await page.evaluate(()=>document.body.style.overflow)).toBe('');await page.getByRole('button',{name:'登录 / 注册',exact:true}).click();await page.keyboard.press('Escape');await expect(page.locator('dialog')).toHaveCount(0);
+  expect(phases.find(p=>p.target==='brand-wordmark')).toMatchObject({delay:900,duration:650});expect(phases.find(p=>p.target==='brand-icon')).toMatchObject({delay:850,duration:700});
+  expect(phases.find(p=>p.target==='intro-logo')).toBeUndefined();
+  await page.getByRole('button',{name:'进入爱爱',exact:true}).click();
+  await expect(page.locator('.intro')).toHaveCount(0,{timeout:3000});await expect(page.locator('.app')).not.toHaveAttribute('inert');expect(await page.evaluate(()=>document.body.style.overflow)).toBe('');
   await page.locator('.offset-0 a').click();await page.goBack();await expect(page.locator('.intro')).toHaveCount(0);
-  await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'重放品牌开屏'}).click();await expect(page.locator('.intro')).toHaveCount(0,{timeout:1000});await expect(page.locator('.nav-logo')).toHaveCSS('visibility','visible');
+  await page.evaluate(()=>sessionStorage.removeItem('aiai:intro-seen'));await page.emulateMedia({reducedMotion:'reduce'});await page.reload();
+  await expect(page.getByRole('button',{name:'进入爱爱',exact:true})).toBeVisible();await page.getByRole('button',{name:'进入爱爱',exact:true}).click();await expect(page.locator('.intro')).toHaveCount(0,{timeout:1000});await expect(page.locator('.nav-logo')).toHaveCSS('visibility','visible');
 });
 
 test('touch targets do not overlap, catalog avoids sticky hover, dialogs restore focus',async({browser})=>{
