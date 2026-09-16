@@ -1,0 +1,55 @@
+{
+  "timeline": {
+    "accelerate": 160,
+    "gather": 820,
+    "flightAt": 900,
+    "flight": 640,
+    "fadeAt": 940,
+    "fadeEnd": 1620,
+    "duration": 1680,
+    "audioDuration": 1620,
+    "short": 360,
+    "shortAudio": 320
+  },
+  "synthesis": "Original additive tones, seeded filtered noise, grains, stereo early reflections",
+  "files": [
+    {
+      "name": "aiai-orbit-v1",
+      "duration": 1.62,
+      "rate": 48000,
+      "bits": 24,
+      "peakDBFS": -6,
+      "rmsDBFS": -23.69694482923957,
+      "monoRmsDBFS": -23.760529059497575,
+      "stereoCorrelation": 0.980800738537675,
+      "firstSample": [
+        0,
+        0
+      ],
+      "lastSample": [
+        0,
+        0
+      ],
+      "mp3Bytes": 33644
+    },
+    {
+      "name": "aiai-orbit-soft-v1",
+      "duration": 0.32,
+      "rate": 48000,
+      "bits": 24,
+      "peakDBFS": -6,
+      "rmsDBFS": -22.10549345770014,
+      "monoRmsDBFS": -22.16070363066208,
+      "stereoCorrelation": 0.9780153692392891,
+      "firstSample": [
+        0,
+        0
+      ],
+      "lastSample": [
+        0,
+        0
+      ],
+      "mp3Bytes": 7724
+    }
+  ]
+}

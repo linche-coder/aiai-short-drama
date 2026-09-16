@@ -9,7 +9,7 @@ test('autoplay yields to real hover, manual pause, modal and page visibility',as
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{value:true,configurable:true});document.dispatchEvent(new Event('visibilitychange'));});const hidden=await page.locator('.offset-0').getAttribute('data-drama-id');await page.waitForTimeout(900);await expect(page.locator('.offset-0')).toHaveAttribute('data-drama-id',hidden!);expect(await page.locator('.hero-poster').evaluateAll(els=>els.flatMap(e=>e.getAnimations()).filter(a=>a.playState==='running').length)).toBe(0);
 });
 test('brand intro still completes once and does not replay after player return',async({page})=>{
-  await page.goto('/');await expect(page.locator('.intro')).toBeVisible();await expect(page.locator('.intro')).toHaveCount(0,{timeout:5000});await expect(page.locator('.nav-logo')).toHaveCSS('visibility','visible');expect(await page.evaluate(()=>document.body.style.overflow)).toBe('');
+  await page.goto('/');await expect(page.locator('.intro')).toBeVisible();await page.getByRole('button',{name:'进入爱爱',exact:true}).click();await expect(page.locator('.intro')).toHaveCount(0,{timeout:5000});await expect(page.locator('.nav-logo')).toHaveCSS('visibility','visible');expect(await page.evaluate(()=>document.body.style.overflow)).toBe('');
   await page.locator('.offset-0 a').click();await expect(page).toHaveURL(/\/play\//);await page.goBack();await expect(page.locator('.hero')).toBeVisible();await expect(page.locator('.intro')).toHaveCount(0);await expect(page.getByRole('button',{name:'重放品牌开屏'})).toHaveCount(0);
 });
 test('resize settles current motion but the next normal step still animates',async({page})=>{
