@@ -1,8 +1,8 @@
 # 接入真实短剧视频
 
-配置文件：[`src/data/videoSources.ts`](src/data/videoSources.ts)。目前配置为空，所有作品均明确显示“该短剧暂未配置视频源”；播放页已经实现，真实短剧片源尚未接入。
+配置文件：[`src/data/videoSources.ts`](src/data/videoSources.ts)。目前正式映射为空。仓库中的 `public/media/demo/landscape.mp4` 与 `portrait.mp4` 是历史自动化素材，不再进入普通用户播放路径；生产构建还会删除 `dist/media/demo`，不会发布这些文件。无正式片源时播放器区域只显示“该集暂时无法播放”。
 
-视频必须是用户提供的实际作品片源。`docs/round-*/motion-review.mp4` 是验收录屏，`tests/fixtures/player-test.mp4` 是合成测试图案，二者均不属于短剧，也没有接入生产页面。
+视频必须是用户提供的实际作品片源。`docs/round-*/motion-review.mp4` 是验收录屏，`tests/fixtures/player-test.mp4` 是合成测试图案，二者均不属于短剧，也没有接入生产页面。现有概念作品的封面、标题与 36 集数量不能作为真实发行、授权或逐集片源证明。
 
 ## 单个视频
 

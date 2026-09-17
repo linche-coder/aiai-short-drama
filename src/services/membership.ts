@@ -1,16 +1,29 @@
-﻿import type{Tier}from'../types/content';
+import type{Tier}from'../types/content';
+import{ApiError,createHttpBackend,type MembershipSnapshotDTO,type SessionDTO}from'./backend';
+
 export type Experiment='A'|'B';
 export type PlanId='basic-month'|'premium-month'|'premium-quarter';
-export const plans:{id:PlanId;title:string;tier:Tier;period:string;prices:Record<Experiment,number>}[]=[{id:'basic-month',title:'基础月卡',tier:'basic',period:'月',prices:{A:19,B:29}},{id:'premium-month',title:'高级月卡',tier:'premium',period:'月',prices:{A:39,B:49}},{id:'premium-quarter',title:'高级季卡',tier:'premium',period:'季',prices:{A:99,B:129}}];
-export interface Account {status:'guest'|'preview';tier:Tier;experiment:Experiment;role:'none'|'preview-admin'}
-let snapshot:Account={status:'guest',tier:'free',experiment:'A',role:'none'};
-try{if(import.meta.env.DEV&&sessionStorage.getItem('aiai:price-preview')==='B')snapshot={...snapshot,experiment:'B'};}catch{/* optional preview preference, never an entitlement */}
+export const plans:{id:PlanId;title:string;tier:Tier;period:string;duration:string;prices:Record<Experiment,number>;benefits:string[]}[]=[
+ {id:'basic-month',title:'基础月卡',tier:'basic',period:'月',duration:'1 个月',prices:{A:19,B:29},benefits:['有效期内观看已上线的基础会员内容','会员有效期为 1 个月','可在订单中查询权益状态']},
+ {id:'premium-month',title:'高级月卡',tier:'premium',period:'月',duration:'1 个月',prices:{A:39,B:49},benefits:['有效期内观看已上线的高级会员内容','包含已上线的基础会员内容','会员有效期为 1 个月']},
+ {id:'premium-quarter',title:'高级季卡',tier:'premium',period:'季',duration:'3 个月',prices:{A:99,B:129},benefits:['有效期内观看已上线的高级会员内容','包含已上线的基础会员内容','会员有效期为 3 个月']},
+];
+export interface Account {status:'guest'|'authenticated';tier:Tier;experiment:Experiment;role:'none'|'content_editor'|'analyst';userId:string|null;nickname:string|null;membership:MembershipSnapshotDTO|null}
+const guest:Account={status:'guest',tier:'free',experiment:'A',role:'none',userId:null,nickname:null,membership:null};
+let snapshot:Account=guest;
 const listeners=new Set<()=>void>();
-function update(patch:Partial<Account>){snapshot={...snapshot,...patch};for(const fn of listeners)fn();}
-export const accountService={subscribe(fn:()=>void){listeners.add(fn);return()=>{listeners.delete(fn);};},getSnapshot:()=>snapshot,
- setPreview(patch:Partial<Account>){if(!import.meta.env.DEV)return;update({...patch,status:'preview'});if(patch.experiment)try{sessionStorage.setItem('aiai:price-preview',patch.experiment);}catch{/* optional */}},
- reset(){update({status:'guest',tier:'free',role:'none'});},
- async quote(id:PlanId){const plan=plans.find(p=>p.id===id);return plan?{plan,experiment:snapshot.experiment,total:plan.prices[snapshot.experiment],checkoutAvailable:false,upgradeAmount:null,expiresAt:null}:null;},
- async checkout(){return{ok:false as const,message:'结算服务尚未开放，未创建订单或扣费。'};},
- async orders(){return [] as {id:string;status:'pending'|'processing'|'paid'|'closed'|'refunding'|'refunded';total:number}[];}
+const csrf=()=>document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content??'';
+const backend=createHttpBackend(csrf);
+function emit(next:Account){snapshot=next;for(const fn of listeners)fn();}
+function accept(session:SessionDTO,fallback?:string){if(!session.subject)throw new ApiError(401,'invalid_session');const role=session.roles.includes('content_editor')?'content_editor':session.roles.includes('analyst')?'analyst':'none';emit({status:'authenticated',tier:session.tier,experiment:'A',role,userId:session.subject,nickname:session.nickname||fallback||session.subject,membership:session.membership??null});}
+export const accountService={
+ subscribe(fn:()=>void){listeners.add(fn);return()=>listeners.delete(fn);},getSnapshot:()=>snapshot,
+ async refresh(){try{const session=await backend.session();if(session.subject)accept(session);else emit(guest);}catch{emit(guest);}},
+ async signIn(input:{account:string;password:string;returnTo:string},signal?:AbortSignal){const session=await backend.signIn(input,signal);accept(session,input.account);return session;},
+ async register(input:{account:string;password:string;email?:string},signal?:AbortSignal){const session=await backend.register(input,signal);accept(session,input.account);return session;},
+ requestPasswordReset(email:string,signal?:AbortSignal){return backend.requestPasswordReset(email,signal);},
+ async reset(){try{await backend.signOut();}finally{emit(guest);}},
+ async quote(id:PlanId,signal?:AbortSignal){return backend.quote(id,signal);},
+ async checkout(planId:PlanId){const quote=await backend.quote(planId);return backend.checkout(quote.id,crypto.randomUUID());},
+ async orders(signal?:AbortSignal){return backend.orders(signal);},
 };

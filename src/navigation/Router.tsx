@@ -42,6 +42,10 @@ export function Router({children}:{children:ReactNode}){
  return <RouterContext.Provider value={{route,navigate,replaceHash}}>{children}</RouterContext.Provider>;
 }
 export const useRouter=()=>useContext(RouterContext);
+export function RouteView({url,children}:{url:string;children:ReactNode}){
+ const parent=useRouter(),parsed=new URL(trustedPath(url),location.origin),route:Route={path:parsed.pathname,search:parsed.search,params:parsed.searchParams,hash:parsed.hash,key:parent.route.key,restore:true,scroll:parent.route.scroll};
+ return <RouterContext.Provider value={{...parent,route}}>{children}</RouterContext.Provider>;
+}
 export function Link({href,restoreHome=false,onClick,...props}:AnchorHTMLAttributes<HTMLAnchorElement>&{href:string;restoreHome?:boolean}){
  const{navigate}=useRouter();const click=(event:MouseEvent<HTMLAnchorElement>)=>{onClick?.(event);if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||props.target&&props.target!=='_self'||props.download!==undefined)return;const url=new URL(href,location.href);if(url.origin!==location.origin)return;event.preventDefault();navigate(url.pathname+url.search+url.hash,restoreHome);};return <a {...props} href={href} onClick={click}/>;
 }
