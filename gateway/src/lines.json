@@ -1,0 +1,16 @@
+{
+  "deploymentOrigin": null,
+  "entryMarker": {
+    "enabled": false,
+    "parameter": "entry",
+    "value": "aiai-gateway"
+  },
+  "lines": [
+    { "name": "爱爱短剧-线路1", "url": null },
+    { "name": "爱爱短剧-线路2", "url": null },
+    { "name": "爱爱短剧-线路3", "url": null },
+    { "name": "爱爱短剧-线路4", "url": null },
+    { "name": "爱爱短剧-线路5", "url": null },
+    { "name": "爱爱短剧-线路6", "url": null }
+  ]
+}
