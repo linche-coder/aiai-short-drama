@@ -1,8 +1,9 @@
 import{useEffect,useState,useSyncExternalStore,type CSSProperties,type PointerEvent}from'react';
-import{ArrowUpRight,BadgeCheck,CalendarDays,Check,ChevronRight,Crown,Diamond,Gauge,Headphones,Play,ReceiptText,ShieldCheck,Sparkles}from'lucide-react';
+import{ArrowUpRight,BadgeCheck,CalendarDays,Check,ChevronRight,Crown,Diamond,Gauge,Headphones,ReceiptText,ShieldCheck,Sparkles}from'lucide-react';
 import{accountService,plans,type Account}from'../services/membership';
 import{useRouter,Link}from'../navigation/Router';
 import{DialogShell}from'../components/DialogShell';
+import{MembershipEmblem}from'../components/MembershipEmblem';
 import '../styles/membership-recharge.css';
 import{AccountAvatar}from'../components/AccountAvatar';
 import{track}from'../services/analytics';
@@ -48,7 +49,7 @@ export function MembershipPage(){
    <section className="recharge-tiers" aria-label="会员方案">
     {tiers.map((tier,index)=><article key={tier.id} className={`recharge-card recharge-${tier.tone}`} onPointerMove={moveSpotlight} style={{'--index':index} as CSSProperties}>
      {index===1&&<div className="recharge-popular"><Crown size={16} fill="currentColor"/> 最受欢迎</div>}
-     <div className="recharge-card-top"><div className="recharge-emblem" aria-hidden="true">{index===0?<Play/>:index===1?<Crown/>:<Diamond/>}<i/><i/></div><h2>{tier.title}</h2></div>
+     <div className="recharge-card-top"><MembershipEmblem level={index}/><h2>{tier.title}</h2></div>
      <div className="recharge-price-area">{tier.original&&<del>¥{tier.original}</del>}<div className="recharge-price"><span>¥</span><strong>{tier.price}</strong>{index>0&&<small>/月</small>}</div></div>
      <div className="recharge-points">{tier.points}</div>
      <div className="recharge-card-rule"/>
