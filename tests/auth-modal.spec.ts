@@ -84,9 +84,11 @@ test('拒绝外部回跳并保留受限剧集的会员路径',async({page})=>{
  await page.screenshot({path:`${docs}/membership-gate-desktop-1440.png`});
  await page.getByRole('link',{name:'开通会员'}).click();
  await expect(page).toHaveURL(/\/membership\?returnTo=.*demo-7/);
- await page.locator('.plan-card').filter({hasText:'基础月卡'}).getByRole('link',{name:'选择方案'}).click();
- await expect(page).toHaveURL(/\/checkout\?plan=basic-month.*returnTo=.*demo-7/);
- await expect(page.getByText('支付服务正在准备中')).toBeVisible();
+ await page.getByRole('button',{name:'立即开通'}).click();
+ await expect(page.getByRole('dialog',{name:'悦享会员'})).toBeVisible();
+ await expect(page.locator('.recharge-purchase .recharge-price strong')).toHaveText('19.9');
+ await expect(page.getByRole('link',{name:'登录后继续'})).toHaveAttribute('href',/offer%3Djoy-month/);
+ await expect(page).toHaveURL(/\/membership\?returnTo=.*demo-7/);
  await expect(page.getByText(/sandbox_order|签名密钥|回调地址/)).toHaveCount(0);
 });
 

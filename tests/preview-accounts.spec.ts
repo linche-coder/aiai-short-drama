@@ -14,9 +14,9 @@ for(const candidate of accounts)test(`${candidate.kind}可通过正式登录弹�
  await page.getByPlaceholder('请输入密码').fill(candidate.password!);
  await page.getByRole('button',{name:'登录',exact:true}).last().click();
  await expect(page).toHaveURL(/\/membership$/);
- if(candidate.avatar==='member')await expect(page.getByRole('heading',{name:'我的会员权益'})).toBeVisible();else await expect(page.getByText(candidate.status,{exact:true})).toBeVisible();
+ if(candidate.avatar==='member')await expect(page.getByRole('heading',{name:'我的会员权益'})).toBeVisible();else await expect(page.getByRole('heading',{name:'爱爱短剧 会员方案'})).toBeVisible();
  await page.reload();
- if(candidate.avatar==='member')await expect(page.getByText('V3 · 入戏玩家',{exact:true})).toBeVisible();else await expect(page.getByText(candidate.status,{exact:true})).toBeVisible();
+ if(candidate.avatar==='member')await expect(page.getByText('V3 · 入戏玩家',{exact:true})).toBeVisible();else await expect(page.getByRole('heading',{name:'爱爱短剧 会员方案'})).toBeVisible();
  await page.goto('/me');
  await expect(page.getByRole('heading',{name:candidate.account!,exact:true})).toBeVisible();
  await expect(page.getByText(/体验账号/)).toHaveCount(0);
