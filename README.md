@@ -1,59 +1,90 @@
+# 爱爱短剧
+
+## v1.1.0 · 会员充值页焕新（2026-09-18）
+
+- 按新版方案呈现免费用户、悦享会员、尊享会员、四档积分补充与两档年卡。
+- 新增霓虹光轨、粒子、悬浮光效和按钮扫光，适配手机与减少动态效果设置。
+- 选购弹层保留套餐金额、登录回跳及原剧集上下文；会员中心续费入口连接新版方案页。
+- 本次业务界面改动限于会员充值相关页面；真实支付服务仍未开放，不创建虚假订单或扣款。
+- 版本记录见 [CHANGELOG.md](CHANGELOG.md)。线上版本号可通过 `/version.json` 查询。
+
+[打开会员充值页](https://aiai-drama-showcase.docile-shell-2494.chatgpt.site/membership?view=plans)
+
+以下日期章节是历史开发记录，其“未发布”状态仅描述对应轮次。
+
+## 2026-09-17 登录注册弹窗与正式界面修订
+
+账号入口现已统一为覆盖当前页面的登录/注册/找回密码弹窗，普通用户界面不再提供测试身份、沙盒注册、假支付或开发验收入口。认证、注册、找回密码、评论和反馈只认真实 HTTP 接口结果；当前外部服务未接通时会显示简洁的不可用反馈。无正式片源时不再播放彩条或标记为可播放。本轮未发布线上版本。
+
+- 修改、验证与外部依赖：[docs/auth-modal/DELIVERY.md](docs/auth-modal/DELIVERY.md)
+- 自动化：`$env:PW_TEST_CHANNEL='chrome'; npx.cmd playwright test tests/auth-modal.spec.ts`
+
+## 2026-09-17 查漏补缺开发交付
+
+本轮在保留现有品牌、首页风格、公开路由与可用功能的基础上，补齐了认证、订单与权益、评论互动、用户留存、帮助反馈及最小运营后台的可审阅本地实现。正式认证、片源、支付、通知和云端数据服务尚未接入；开发环境中的测试身份、测试视频、订单回调和互动数据均位于明确隔离的浏览器沙箱，生产构建会关闭测试身份、移除测试视频并隐藏演示后台。本轮没有发布线上版本、不会发起真实扣款或发送真实通知。
+
+- 当前进度与阻塞：[PROGRESS.md](PROGRESS.md)
+- 页面地图、真实/演示边界、接口与验收说明：[docs/closure/DELIVERY.md](docs/closure/DELIVERY.md)
+- 核心自动化：`$env:PW_TEST_CHANNEL='chrome'; npx.cmd playwright test tests/closure.spec.ts`
+- 生产边界冒烟：先运行 `npm.cmd run preview`，再运行 `node scripts/smoke-closure.mjs`
+
+以下章节保留此前轮次的历史记录；若与本节冲突，以本轮交付文档为准。
+
 ## 2026-09-16 首页粒子入场（仅本地）
 
-首页改为静音粒子环绕和原 LOGO 分组显现，等待点击“进入爱爱”；点击后 1.68 秒内汇聚、提示音、LOGO 移至页头并显示首页。粒子已放大并加密，仅保留“进入爱爱”按钮；减少动态效果采用短淡出。首页加载不再阻塞欢迎界面。此版本没有线上部署，下方开屏自动播放、3862ms 和 V4 音频描述仅为历史记录。
+React 19 + TypeScript + Vite 构建的短剧界面项目，包含普通区、18+专区、Banner 轮播、播放页、选集、收藏及品牌开屏动画。
 
-新音频、声画时间表、测试结果及实体试听未完成说明见 [本次交付](docs/intro-orbit/VERIFICATION.md)。音频重生成：`node scripts/render-intro-orbit.mjs`。
+## 在线预览
 
-## 2026-09-15 整站线上发布
+[打开网站](https://aiai-drama-showcase.docile-shell-2494.chatgpt.site)
 
-本次按用户要求发布完整普通区和专区页面，生产构建保留专区封面目录、普通区演示视频与 V4 开屏音效。正式剧集片源仍未配置，演示视频沿用明确的演示标识。下方历史文档中“生产关闭演示/专区目录”和“未发布”的说明仅对应此前轮次。
+## 首页入场体验
 
-﻿# 爱爱短剧 · M4
+首页使用原品牌 LOGO 分组显现和粉紫粒子环绕，静音等待用户点击“进入爱爱”。点击后约 1.68 秒内完成粒子汇聚、品牌提示音、LOGO 移向页头和首页显现。仅保留一个进入按钮，同一标签页会话成功进入后不重复展示。
 
-React 19 + TypeScript + Vite，沿用原始品牌、暗色粉紫视觉、五卡 Banner 与品牌开屏。普通内容、18+门槛、会员、隐私、CMS 和指标页面已分开；业务后端尚未接入。本轮为本地可运行结果，没有线上发布。
+粒子按桌面与手机分别使用 280 / 144 颗，并限制画布像素密度。支持键盘导航、减少动态效果、慢加载和音频失败降级；鼠标或触屏进入后不会给页头 LOGO 留下焦点框。
 
-## 启动与验收
+原创音效的 WAV 母版与 MP3 位于 `public/assets/audio/aiai-orbit*`。安装 FFmpeg 后运行 `node scripts/render-intro-orbit.mjs` 可重新生成，声画共用 `src/motion/introTimeline.json`。手机扬声器、耳机的实体听感试听尚未完成。
 
-```powershell
-npm.cmd run dev
-# http://localhost:5173
-npm.cmd run build
-npm.cmd run preview
-# http://localhost:4173（生产预览不提供开发场景和管理页面）
-$env:PW_TEST_CHANNEL = 'chrome'
-npm.cmd test
+专项测试：`npx playwright test tests/intro-sound.spec.ts`。测试默认使用 Playwright Chromium，也可通过 `PW_TEST_CHANNEL=chrome` 使用已安装的 Chrome。
+
+## 本地运行
+
+需要 Node.js 22 或更新版本。
+
+```bash
+npm ci
+npm run dev
 ```
 
-依赖已安装；换机器先 `npm.cmd install`，并安装 Playwright 所需浏览器。测试使用独立 Chrome，不读取个人浏览资料。生产检查：`node scripts/audit-m4.mjs`（先启动 preview）。录屏及交互截图：`node scripts/capture-m4.mjs`；新页面截图库：`node scripts/screenshots-m4.mjs`（均先启动 dev）。
+浏览器打开终端显示的本地地址。
 
-主导航：首页、短剧、漫剧、排行榜、18+专区、我的。会员入口在顶部，免费/片单入口在首页。`/me` 下展开“开发预览场景 · 仅本地”，可选择内容加载、地区、会员、价格实验和独立后台角色。18+专区现为单次主动确认提示，点击后保留当前标签页会话确认，刷新与站内切换不重复提示；退出专区会清除确认。开发地区场景不再影响这个提示流程。生产内容服务尚未接入，确认后显示明确的服务未接入状态。
+## 构建与预览
 
-## 数据和真实能力
+```bash
+npm run build
+npm run preview
+```
 
-当前首页已按用户要求恢复旧版 18 部作品的封面、标题和顺序。封面从本地快照恢复，题材与简介仍为展示编排，正式分级、授权与片源没有完成接入。原始素材与历史备份保留。
+构建产物在 `dist/`。部署至静态托管时，需要将站内路由回退到 `index.html`。
 
-片源配置不再仅靠旧 `videoSources` ID 映射。必须先从内容服务取得符合域/发布/授权条件的作品，再获得服务端播放许可。开发服务器为内部测试提供独立的中性演示视频与 36 个演示集数，卡片标注“体验演示 / 演示片源”。演示配置不写入正式 `Content.media`，不改变发布与授权判断；生产构建关闭演示播放。演示浏览也不写入真实观看历史。
+## 项目结构
 
-会员方案是价格与包含关系的本地界面预览；不扣费，不创建订单，不计算虚构升级差价。CMS 本地草稿和正式发布严格区分，任何输入 proofId 都不能代替服务端核验。分析默认暂无业务数据；本地记录不计成绩。
+- `src/components/`：共享界面、播放器与播放页
+- `src/adult/`：专区 Banner、导航及卡片
+- `src/data/`：展示数据与视频配置
+- `src/dev/assets/catalog/`：专区封面
+- `public/assets/`：品牌、Banner、普通区封面和音效
 
-## 文档
+## 当前功能范围
 
-- [M4 完整验收与页面入口](M4-VERIFICATION.md)
-- [旧作品迁移清单](docs/m4/MIGRATION.md)
-- [接口契约与真实接入状态](docs/m4/API-CONTRACTS.md)
-- [部署层保护示例及未应用说明](docs/m4/DEPLOYMENT.md)
-- [备份与恢复](docs/m4/RESTORE.md)
+这是用于展示和检查样式的前端项目。正式作品片源、认证服务和会员支付尚未接入生产服务；无正式片源时页面显示不可播放状态。开发预览账号和演示数据与生产构建明确隔离，收藏等部分状态保存在浏览器中。
 
-`ROUND5-VERIFICATION.md` 及更早轮次是历史记录。M4 保留第五轮的 ±2 外侧 hover 规则、中心 5 / 内侧 4 / 外侧 3 层级、440ms 轮播和首次访问策略；LOGO reveal 1550ms、hold 412ms、transition 1900ms、flight 1150ms，总时长 3862ms。本轮没有再缩短。
+仓库包含当前运行所需素材，不包含本地缓存、账号凭据或工作备份。素材使用权不因仓库公开而自动转授。
 
-## 本轮内部产品测试
+## 替换素材
 
-运行 `npm.cmd run dev`，访问 http://localhost:5173/。查看 [本轮验收说明](PRODUCT-TEST-VERIFICATION.md)。标签筛选、中文面包屑、播放控件和 36 集演示配置均已接入；免费 1–6 集、基础 1–30 集、高级全部，账号切换位于选集下方。所有视频均为中性色条测试素材，非作品正式视频。
-
-专项检查：`npx.cmd playwright test tests/product-test.spec.ts tests/restored-covers.spec.ts`。旧 M4、ROUND 文档和测试中与概念目录数量、无源界面绑定的断言属于历史版本，不能当成本轮完整验收结果。
-
-## 18+ 专区主题与交互（2026-09-15）
-
-最新定向调整：[新版首页、简化提示、共享筛选与验收截图](docs/adult-direction/VERIFICATION.md)。`/18plus` 为专区综合首页，`/18plus?tab=shorts` 为成人短剧分类。以下早期交付文档中的旧提示流程与 Banner 布局以新版验收说明为准。
-
-新增独立暖黑酒红专区：[本轮交付、截图和验收](docs/adult/VERIFICATION.md)。开发入口 `/18plus` 点击一次“确认并进入”即可查看现有封面样例；提示仅记录主动声明，不代表身份或服务器授权。生产内容仍待接入。本轮取消专区自动生成的 36 集测试片源，普通页面演示播放保留。封面与真实服务边界见 [素材映射](docs/adult/asset-mapping.json) 和 [接入说明](docs/adult/SERVICE-BOUNDARY.md)。
+Banner 配置：`src/data/adultBanners.ts`  
+专区目录：`src/dev/adultPreview.ts`  
+正式视频配置：`src/data/videoSources.ts`  
+占位播放配置：`src/data/demoPlayback.ts`

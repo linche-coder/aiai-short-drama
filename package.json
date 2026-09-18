@@ -1,13 +1,16 @@
 {
   "name": "aiai-short-drama",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:closure": "playwright test auth-modal.spec.ts",
+    "test:auth": "playwright test auth-modal.spec.ts",
+    "smoke:closure": "node scripts/smoke-closure.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

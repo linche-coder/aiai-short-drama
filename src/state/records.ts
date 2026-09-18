@@ -3,9 +3,10 @@ import type{ContentZone}from'../types/content';
 import{accessService}from'../services/access';
 export interface Privacy {hideGreen:boolean;hideAdult:boolean;neutralNotifications:boolean;adultNotifications:false}
 interface RecordsState {privacy:Privacy;green:string[];adult:string[];wishlist:string[];reservations:string[];revision:number}
-let state:RecordsState={privacy:{hideGreen:false,hideAdult:true,neutralNotifications:true,adultNotifications:false},green:[],adult:[],wishlist:[],reservations:[],revision:0};
+const defaults:RecordsState={privacy:{hideGreen:false,hideAdult:true,neutralNotifications:true,adultNotifications:false},green:[],adult:[],wishlist:[],reservations:[],revision:0};
+let state:RecordsState=defaults;try{const saved=JSON.parse(localStorage.getItem('aiai:guest-records:v1')||'null') as Pick<RecordsState,'privacy'|'green'>|null;if(saved)state={...defaults,privacy:{...defaults.privacy,...saved.privacy},green:Array.isArray(saved.green)?saved.green:[]};}catch{/* keep safe defaults */}
 const listeners=new Set<()=>void>();
-const emit=(patch:Partial<RecordsState>)=>{state={...state,...patch,revision:state.revision+1};for(const fn of listeners)fn();};
+const emit=(patch:Partial<RecordsState>)=>{state={...state,...patch,revision:state.revision+1};try{localStorage.setItem('aiai:guest-records:v1',JSON.stringify({privacy:state.privacy,green:state.green}));}catch{/* device-local persistence is optional */}for(const fn of listeners)fn();};
 const channel=typeof window!=='undefined'&&typeof BroadcastChannel!=='undefined'?new BroadcastChannel('aiai:local-records'):null;
 channel?.addEventListener('message',e=>{if(e.data==='clear-private-history')emit({adult:[]});if(e.data==='clear-private')emit({adult:[],wishlist:[],reservations:[]});if(e.data==='clear-green')emit({green:[]});});
 export const records={subscribe(fn:()=>void){listeners.add(fn);return()=>{listeners.delete(fn);};},getSnapshot:()=>state,
