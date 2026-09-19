@@ -1,3 +1,4 @@
+import {FestivalArtwork,festivalAssets} from './FestivalArtwork';
 import { memo, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import type { Content } from '../types/content';
@@ -12,7 +13,8 @@ export const slotFor = (item: number, index: number, count = 5) => count > 0 ? (
 interface Props { items:Content[]; initialIndex?:number; initialId?:string|null; initialPaused?:boolean; reduced:boolean; blocked:boolean; onPositionChange?:(index:number,id:string,paused:boolean)=>void }
 export const Carousel = memo(function Carousel(props:Props) {
   if(!props.items.length)return <section className="hero-empty empty-state"><h1>新的好故事，正在准备中</h1><p>精选内容就绪后将在这里呈现。</p></section>;
-  return <CarouselTrack key={props.items.map(item=>item.id).join('|')} {...props}/>;
+  const items=[{...props.items[0],id:'festival',title:'双节福利',ambient:festivalAssets.desktop},...props.items];
+  return <CarouselTrack key={items.map(item=>item.id).join('|')} {...props} items={items}/>;
 });
 const position = (slot: number) => slot === 0 ? 'translate(-50%,-50%)' : `translate(calc(-50% ${slot > 0 ? '+' : '-'} var(--${Math.abs(slot) === 1 ? 'near' : 'far'})),-50%) translateZ(${Math.abs(slot) === 1 ? -65 : -150}px) rotateY(${slot > 0 ? -1 : 1}deg) scale(${Math.abs(slot) === 1 ? .95 : .88})`;
 
@@ -100,10 +102,10 @@ function CarouselTrack({items,initialIndex=0,initialId,initialPaused=false,reduc
     <h1 className="sr-only">爱爱短剧 · 发现你的下一部好故事</h1>
     <div className="hero-ambience" aria-hidden="true">{items.map((item,i)=><div key={item.id} data-drama-id={item.id} className={`ambient-layer ${i === index ? 'active' : ''}`} style={{ backgroundImage:`url(${item.ambient})` }} />)}</div>
     <div className="hero-inner"><div className="carousel-stage">
-      {items.map((item,i)=>{const slot=slotFor(i,index,items.length); const visible=Math.abs(slot)<=(wide?2:1);return <article key={item.id} hidden={!visible} className={`hero-poster offset-${slot}`} data-slot={slot} data-outer={Math.abs(slot)===2} data-drama-id={item.id} aria-current={slot===0?'true':undefined} style={{transform:position(slot)}}>
-        <Link className="hero-surface drama-link" href={contentHref(item)} tabIndex={visible?0:-1} aria-label={`${contentLabel(item)}：${item.title}，${item.genre}，${availability(item)}`}>
-          <div className="hero-cover"><Poster drama={item} priority /><span className="cover-shade" /></div><span className="poster-edge" />
-          {slot===0 && <span className="featured-badge">本期精选</span>}<CardInfo drama={item} banner />
+      {items.map((item,i)=>{const slot=slotFor(i,index,items.length); const visible=Math.abs(slot)<=(wide?2:1);return <article key={item.id} hidden={!visible} className={`hero-poster offset-${slot} ${item.id==='festival'?'hero-festival':''}`} data-slot={slot} data-outer={Math.abs(slot)===2} data-drama-id={item.id} aria-current={slot===0?'true':undefined} style={{transform:position(slot)}}>
+        <Link className="hero-surface drama-link" href={item.id==='festival'?'/festival':contentHref(item)} tabIndex={visible?0:-1} aria-label={item.id==='festival'?'双节福利，最高领120积分':`${contentLabel(item)}：${item.title}，${item.genre}，${availability(item)}`}>
+          {item.id==='festival'?<><FestivalArtwork compact portrait/><span className="festival-carousel-cta">去领双节好礼 <ChevronRight size={16}/></span></>:<><div className="hero-cover"><Poster drama={item} priority /><span className="cover-shade" /></div><span className="poster-edge" />
+          {slot===0 && <span className="featured-badge">本期精选</span>}<CardInfo drama={item} banner /></>}
         </Link>
       </article>;})}
       {items.length>1&&<><button className="carousel-arrow previous" aria-label="上一部短剧" onClick={()=>manual(target.current-1)}><ChevronLeft /></button>

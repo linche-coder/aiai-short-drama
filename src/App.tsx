@@ -1,3 +1,7 @@
+import './styles/festival.css';
+import './styles/festival-campaign.css';
+import {FestivalPage} from './pages/FestivalPage';
+import {PointsPage} from './pages/PointsPage';
 import{lazy,Suspense,useEffect,useRef}from'react';
 import{Router,RouteView,useRouter,Link}from'./navigation/Router';import{HomePage}from'./HomePage';import{Header}from'./components/Header';import{Footer}from'./components/Footer';import{PlayPage}from'./components/PlayPage';import{CatalogPage,CollectionsPage,RankingsPage}from'./pages/CatalogPages';import{AdultBoundary,AdultPage,AdultSearch,WishlistPage}from'./pages/AdultPages';import{MembershipPage}from'./pages/MembershipPage';import{MePage,OrdersPage,PrivacyPage}from'./pages/AccountPages';import{AuthPage}from'./pages/AuthPages';import{AccountModal,type AccountMode}from'./components/AccountModal';import{CheckoutPage,OrderDetailPage,PaymentResultPage}from'./pages/CommercePages';import{FavoritesPage,HistoryPage,MessagesPage,MyCommentsPage,ProfilePage}from'./pages/RetentionPages';import{FeedbackPage,HelpPage,PolicyPage,TicketsPage}from'./pages/SupportPages';import{NotFound,LoadingState}from'./components/content/PageParts';import{accessService}from'./services/access';import{trustedPath}from'./services/rules';import{accountService}from'./services/membership';
 const AdminPage=import.meta.env.DEV?lazy(()=>import('./dev/AdminPage')):null;
@@ -5,7 +9,20 @@ const AdminOpsPage=import.meta.env.DEV?lazy(()=>import('./dev/AdminOpsPage')):nu
 const PreviewControls=import.meta.env.DEV?lazy(()=>import('./dev/PreviewControls')):null;
 const authPath:Record<AccountMode,string>={login:'login',register:'register',forgot:'forgot-password'};
 function safeAuthReturn(value:string|null){if(!value||!value.startsWith('/')||value.startsWith('//')||/[\\\r\n]/.test(value))return'/#home';const target=trustedPath(value);return target.startsWith('/account/')?'/#home':target;}
-function Pages(){const{route,navigate}=useRouter(),match=route.path.match(/^\/account\/(login|register|forgot-password|session-expired)$/);if(!match)return <SitePages/>;const returnTo=safeAuthReturn(route.params.get('returnTo')),mode:AccountMode=match[1]==='register'?'register':match[1]==='forgot-password'?'forgot':'login';const go=(next:AccountMode)=>navigate(`/account/${authPath[next]}?returnTo=${encodeURIComponent(returnTo)}`,{replace:true,preserveScroll:true});const finish=()=>navigate(returnTo,{replace:true,preserveScroll:true});return <><RouteView url={returnTo}><SitePages/></RouteView><AccountModal mode={mode} returnTo={returnTo} onMode={go} onClose={finish} onSuccess={finish}/></>}
+function Pages(){
+ const{route,navigate}=useRouter(),match=route.path.match(/^\/account\/(login|register|forgot-password|session-expired)$/);
+ const returnTo=match?safeAuthReturn(route.params.get('returnTo')):route.path+route.search+route.hash;
+ // Keep the background mounted, including its route key, across auth overlays.
+ const background=useRef({url:returnTo,key:route.key,auth:!!match,sourceKey:route.key});
+ if(background.current.sourceKey!==route.key){
+  const preserve=background.current.url===returnTo&&(!!match||background.current.auth);
+  background.current={url:returnTo,key:preserve?background.current.key:route.key,auth:!!match,sourceKey:route.key};
+ }
+ const mode:AccountMode=match?.[1]==='register'?'register':match?.[1]==='forgot-password'?'forgot':'login';
+ const go=(next:AccountMode)=>navigate(`/account/${authPath[next]}?returnTo=${encodeURIComponent(returnTo)}`,{replace:true,preserveScroll:true});
+ const finish=()=>navigate(returnTo,{replace:true,preserveScroll:true});
+ return <><RouteView url={returnTo} routeKey={background.current.key}><SitePages/></RouteView>{match&&<AccountModal mode={mode} returnTo={returnTo} onMode={go} onClose={finish} onSuccess={finish}/>}</>;
+}
 function SitePages(){const{route,navigate}=useRouter(),logo=useRef<HTMLImageElement>(null);useEffect(()=>{if(route.path.startsWith('/18plus')&&!accessService.isConfirmed())document.title='爱爱短剧 · 访问确认';else if(!route.path.startsWith('/18plus')&&!route.path.startsWith('/play/'))document.title='爱爱短剧 · 好故事，一眼入戏';},[route.key,route.path]);const onAccount=()=>navigate(`/account/login?returnTo=${encodeURIComponent(route.path+route.search+route.hash)}`);
  let page:React.ReactNode;const play=route.path.match(/^\/(play|read)\/([^/]+)$/),privatePlay=route.path.match(/^\/18plus\/play\/([^/]+)$/),collection=route.path.match(/^\/collections\/([^/]+)$/),order=route.path.match(/^\/me\/orders\/([^/]+)$/),ticket=route.path.match(/^\/support\/tickets\/([^/]+)$/),supportTopic=route.path.match(/^\/support\/(account|playback|membership|orders|privacy)$/),auth=route.path.match(/^\/account\/(reset-password|verify)$/);const decode=(id:string)=>{try{return decodeURIComponent(id);}catch{return '';}};
  const needsAdult=route.path.startsWith('/18plus')||(route.path==='/membership'&&route.params.get('context')==='adult')||!!(play&&/^private-preview-|^legacy-adult-preview$/.test(decode(play[2])));
@@ -20,9 +37,11 @@ function SitePages(){const{route,navigate}=useRouter(),logo=useRef<HTMLImageElem
  else if(privatePlay)page=<PlayPage key={privatePlay[1]} id={decode(privatePlay[1])} adult/>;
  else if(play)page=<PlayPage key={play[2]} id={play[2]==='legacy-adult-preview'?'private-preview-1':decode(play[2])} adult={needsAdult} reading={play[1]==='read'}/>;
  else if(auth)page=<AuthPage kind={auth[1]==='verify'?'verify':'reset'}/>;
+ else if(route.path==='/festival')page=<FestivalPage/>;
  else if(route.path==='/membership')page=<MembershipPage/>;
  else if(route.path==='/checkout')page=<CheckoutPage/>;
  else if(route.path==='/payment-result')page=<PaymentResultPage/>;
+ else if(route.path==='/me/points')page=<PointsPage/>;
  else if(route.path==='/me')page=<MePage/>;
  else if(route.path==='/me/privacy')page=<PrivacyPage/>;
  else if(route.path==='/me/orders')page=<OrdersPage/>;

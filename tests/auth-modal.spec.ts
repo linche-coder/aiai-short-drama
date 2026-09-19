@@ -1,7 +1,28 @@
 import{test,expect}from'@playwright/test';
 const docs='docs/auth-modal';
 
+test('login overlay preserves the mounted background on open, mode change and success',async({page})=>{
+ await page.route('**/api/v1/auth/sign-in',route=>route.fulfill({status:200,json:{subject:'reader_01',nickname:'读者',tier:'free',roles:[],expiresAt:'2026-10-17T00:00:00.000Z'}}));
+ await page.goto('/#home');
+ await expect(page.getByRole('heading',{name:'热门推荐'})).toBeVisible();
+ const home=await page.locator('#home').elementHandle();
+ await page.getByRole('button',{name:'登录 / 注册'}).click();
+ await expect(page.getByRole('dialog',{name:'登录注册'})).toBeVisible();
+ expect(await home!.evaluate(node=>node.isConnected)).toBe(true);
+ await page.getByRole('tab',{name:'注册',exact:true}).click();
+ expect(await home!.evaluate(node=>node.isConnected)).toBe(true);
+ await page.getByRole('tab',{name:'登录',exact:true}).click();
+ await page.getByPlaceholder('请输入账号').fill('reader_01');
+ await page.getByPlaceholder('请输入密码').fill('secure-pass');
+ await page.getByRole('button',{name:'登录',exact:true}).last().click();
+ await expect(page.getByRole('dialog',{name:'登录注册'})).toHaveCount(0);
+ expect(await home!.evaluate(node=>node.isConnected)).toBe(true);
+ await expect(page.locator('header .user-avatar')).toBeVisible();
+ await expect(page.getByRole('dialog',{name:'欢迎来到爱爱短剧'})).toHaveCount(0);
+});
+
 test.beforeEach(async({page})=>{
+ await page.route('**/api/v1/me/points',route=>route.fulfill({status:503,json:{code:'service_unavailable'}}));
  await page.addInitScript(()=>sessionStorage.setItem('aiai:intro-seen','yes'));
  await page.route('**/api/v1/session',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({subject:null,tier:'free',roles:[],expiresAt:null})}));
 });
@@ -76,19 +97,22 @@ test('拒绝外部回跳并保留受限剧集的会员路径',async({page})=>{
  await page.getByPlaceholder('请输入账号').fill('reader_01');await page.getByPlaceholder('请输入密码').fill('secure-pass');await page.getByRole('button',{name:'登录',exact:true}).last().click();
  await expect(page).toHaveURL(/\/#home$/);await expect(page).not.toHaveURL(/evil\.example/);
  await page.goto('/play/drama-05?episode=demo-1');
- await page.getByRole('button',{name:/第7集，需基础会员权益/}).click();
- await expect(page.getByRole('heading',{name:'本集需要基础会员权益'})).toBeVisible();
+ await page.route('**/api/v1/session',route=>route.fulfill({json:{subject:'reader_01',tier:'free',roles:[],expiresAt:null}}));
+ await page.route('**/api/v1/me/points',route=>route.fulfill({json:{summary:{balance:0,tier:'free',monthlyAllowance:40,checkedInToday:false,demo:false},transactions:[],unlocks:[]}}));
+ await page.reload();
+ await page.getByRole('button',{name:/第7集，需10积分解锁/}).click();
+ await expect(page.getByRole('heading',{name:'积分不足'})).toBeVisible();
  const gate=page.getByRole('dialog');
  await expect(gate.getByRole('button',{name:'关闭',exact:true})).toHaveCount(0);
- await expect(gate.locator('.membership-gate-actions')).toHaveCSS('gap','14px');
+ await expect(gate.locator('.points-actions')).toHaveCSS('gap','12px');
  await page.screenshot({path:`${docs}/membership-gate-desktop-1440.png`});
  await page.getByRole('link',{name:'开通会员'}).click();
- await expect(page).toHaveURL(/\/membership\?returnTo=.*demo-7/);
+ await expect(page).toHaveURL(/\/membership\?view=plans&returnTo=.*demo-7/);
  await page.getByRole('button',{name:'立即开通'}).click();
  await expect(page.getByRole('dialog',{name:'悦享会员'})).toBeVisible();
  await expect(page.locator('.recharge-purchase .recharge-price strong')).toHaveText('19.9');
- await expect(page.getByRole('link',{name:'登录后继续'})).toHaveAttribute('href',/offer%3Djoy-month/);
- await expect(page).toHaveURL(/\/membership\?returnTo=.*demo-7/);
+ await expect(page.getByRole('button',{name:'支付暂不可用'})).toBeDisabled();
+ await expect(page).toHaveURL(/\/membership\?view=plans&returnTo=.*demo-7/);
  await expect(page.getByText(/sandbox_order|签名密钥|回调地址/)).toHaveCount(0);
 });
 

@@ -1,6 +1,7 @@
 import {test,expect} from '@playwright/test';
 
 test.beforeEach(async({page})=>{
+ await page.route('**/api/v1/me/points',route=>route.fulfill({status:503,json:{code:'service_unavailable'}}));
  await page.route('**/api/v1/session',route=>route.fulfill({json:{subject:null,tier:'free',roles:[],expiresAt:null}}));
 });
 

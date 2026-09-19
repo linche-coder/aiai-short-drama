@@ -1,3 +1,4 @@
+import {captureFestivalReferral} from '../services/festivalReferral';
 ﻿import{createContext,useCallback,useContext,useLayoutEffect,useState}from'react';
 import type{AnchorHTMLAttributes,MouseEvent,ReactNode}from'react';
 import{cancelResultsTransition}from'../motion/transitions';
@@ -28,8 +29,8 @@ export function Router({children}:{children:ReactNode}){
  const replaceHash=useCallback((hash:string)=>{if(location.pathname!=='/')return;saveHomeState({hash});history.replaceState(history.state,'',location.pathname+location.search+hash);storeScroll();setRoute(previous=>previous.hash===hash?previous:{...previous,hash});},[]);
  const navigate=(to:string,raw:boolean|Options=false)=>{
   const options=typeof raw==='boolean'?{restore:raw}:raw;
-  const url=new URL(trustedPath(to),location.origin);storeScroll();if(!isPrivate(location.pathname))saveHomeState({scroll:scrollY},location.pathname);cancelResultsTransition();
-  const saved=readHomeState(url.pathname);if(url.pathname==='/'&&!options.restore){saveHomeState({query:'',genre:'全部',scroll:0,hash:url.hash||'#home'});}
+  const url=new URL(trustedPath(to),location.origin);captureFestivalReferral(url.searchParams.get('invite'));storeScroll();if(!isPrivate(location.pathname))saveHomeState({scroll:scrollY},location.pathname);cancelResultsTransition();
+  const saved=readHomeState(url.pathname);if(url.pathname==='/'&&!options.restore&&!options.preserveScroll){saveHomeState({query:'',genre:'全部',scroll:0,hash:url.hash||'#home'});}
   if(options.restore&&url.pathname==='/')url.hash=saved.hash;
   const scroll=options.preserveScroll?scrollY:options.restore?saved.scroll:0;
   const source=location.pathname+location.search+location.hash;const isList=/^\/(?:$|shorts$|comics$|free$|search$|collections(?:\/|$)|me$|18plus(?:$|\/search$|\/wishlist$))/.test(location.pathname);
@@ -42,8 +43,8 @@ export function Router({children}:{children:ReactNode}){
  return <RouterContext.Provider value={{route,navigate,replaceHash}}>{children}</RouterContext.Provider>;
 }
 export const useRouter=()=>useContext(RouterContext);
-export function RouteView({url,children}:{url:string;children:ReactNode}){
- const parent=useRouter(),parsed=new URL(trustedPath(url),location.origin),route:Route={path:parsed.pathname,search:parsed.search,params:parsed.searchParams,hash:parsed.hash,key:parent.route.key,restore:true,scroll:parent.route.scroll};
+export function RouteView({url,routeKey,children}:{url:string;routeKey?:number;children:ReactNode}){
+ const parent=useRouter(),parsed=new URL(trustedPath(url),location.origin),route:Route={path:parsed.pathname,search:parsed.search,params:parsed.searchParams,hash:parsed.hash,key:routeKey??parent.route.key,restore:parent.route.path===parsed.pathname?parent.route.restore:true,scroll:parent.route.scroll};
  return <RouterContext.Provider value={{...parent,route}}>{children}</RouterContext.Provider>;
 }
 export function Link({href,restoreHome=false,onClick,...props}:AnchorHTMLAttributes<HTMLAnchorElement>&{href:string;restoreHome?:boolean}){

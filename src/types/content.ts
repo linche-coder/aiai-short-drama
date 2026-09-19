@@ -23,4 +23,4 @@ export interface AccessContext { zone: ContentZone; channel: 'preview'|'release'
 export interface Collection { id: string; name: string; description: string; theme: string; cover: string; content_ids: string[]; updated_at: string; content_zone: ContentZone; is_demo: boolean }
 export interface Campaign { id: string; title: string; description: string; content_zone: ContentZone; starts_at: string; ends_at: string; status: 'preview'|'active'|'disabled'; visibility: 'public'|'qualified'; target: string; is_demo: boolean }
 export const formatLabels: Record<Format,string> = {live_action_drama:'真人短剧',motion_comic:'漫剧',short_film:'短片',article:'文章'};
-export const tierLabels: Record<AccessTier,string> = {free:'免费',basic:'基础权益',premium:'高级权益',coin_reserved:'暂未开放'};
+export const tierLabels: Record<AccessTier,string> = {free:'免费用户',basic:'悦享会员',premium:'尊享会员',coin_reserved:'暂未开放'};

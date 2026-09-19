@@ -2,7 +2,7 @@ import{test,expect}from'@playwright/test';
 
 const accounts=[
  {kind:'免费账号',account:process.env.PREVIEW_FREE_ACCOUNT,password:process.env.PREVIEW_FREE_PASSWORD,status:'当前：免费用户',avatar:'free',screenshot:'account-free-desktop-1440.png'},
- {kind:'会员账号',account:process.env.PREVIEW_MEMBER_ACCOUNT,password:process.env.PREVIEW_MEMBER_PASSWORD,status:'当前：高级会员',avatar:'member',screenshot:'account-member-desktop-1440.png'},
+ {kind:'会员账号',account:process.env.PREVIEW_MEMBER_ACCOUNT,password:process.env.PREVIEW_MEMBER_PASSWORD,status:'当前：尊享会员',avatar:'member',screenshot:'account-member-desktop-1440.png'},
 ];
 
 for(const candidate of accounts)test(`${candidate.kind}可通过正式登录弹窗建立预览会话`,async({page})=>{
@@ -16,7 +16,7 @@ for(const candidate of accounts)test(`${candidate.kind}可通过正式登录弹�
  await expect(page).toHaveURL(/\/membership$/);
  if(candidate.avatar==='member')await expect(page.getByRole('heading',{name:'我的会员权益'})).toBeVisible();else await expect(page.getByRole('heading',{name:'爱爱短剧 会员方案'})).toBeVisible();
  await page.reload();
- if(candidate.avatar==='member')await expect(page.getByText('V3 · 入戏玩家',{exact:true})).toBeVisible();else await expect(page.getByRole('heading',{name:'爱爱短剧 会员方案'})).toBeVisible();
+ if(candidate.avatar==='member')await expect(page.locator('.member-center .member-tier')).toBeVisible();else await expect(page.getByRole('heading',{name:'爱爱短剧 会员方案'})).toBeVisible();
  await page.goto('/me');
  await expect(page.getByRole('heading',{name:candidate.account!,exact:true})).toBeVisible();
  await expect(page.getByText(/体验账号/)).toHaveCount(0);
@@ -35,10 +35,10 @@ for(const candidate of accounts)test(`${candidate.kind}可通过正式登录弹�
   expect(Math.abs(profileNavWidth-historyNavWidth)).toBeLessThanOrEqual(1);
  }else{
   await page.locator('header').getByRole('link',{name:'会员中心'}).click();
-  await expect(page.getByText('V3 · 入戏玩家',{exact:true})).toBeVisible();
+  await expect(page.locator('.member-center .member-tier')).toBeVisible();
   await expect(page.getByRole('heading',{name:'我的会员权益'})).toBeVisible();
   await page.screenshot({path:'docs/auth-modal/member-center-desktop-1440.png',fullPage:true});
   await page.setViewportSize({width:390,height:844});await page.reload();expect(await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)).toBeLessThanOrEqual(1);await page.screenshot({path:'docs/auth-modal/member-center-mobile-390.png',fullPage:true});
-  await page.goto('/me');await page.locator('.account-links a[href="/membership"]').click();await expect(page.getByText('V3 · 入戏玩家',{exact:true})).toBeVisible();
+  await page.goto('/me');await page.locator('.account-links a[href="/membership"]').click();await expect(page.locator('.member-center .member-tier')).toBeVisible();
  }
 });
