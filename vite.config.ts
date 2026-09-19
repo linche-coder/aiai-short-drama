@@ -41,6 +41,13 @@ export function previewAuth(accounts:PreviewAccount[],pointsFile=resolve(import.
     const input=mutation?await body(request):{};
     try{const adult=path.includes('/contents/private-preview-')?(await server.ssrLoadModule('/src/dev/adultPreview.ts')).adultPreview:[];const data=points.run(session.account.account,session.account.tier,path,input,adult);json(response,200,path.endsWith('/summary')?data.summary:path.endsWith('/transactions')?data.transactions:path.endsWith('/unlocks')?data.unlocks:data);}catch(error){const code=error instanceof Error?error.message:'service_unavailable';json(response,code==='insufficient_points'||code==='idempotency_conflict'?409:code==='content_unavailable'?404:400,{code});}return;
    }
+   if(request.method==='GET'&&(path==='/api/v1/orders'||path.startsWith('/api/v1/orders/'))){
+    const session=sessions.get(token(request)||'');if(!session||Date.parse(session.expiresAt)<=Date.now()){json(response,401,{code:'session_expired'});return;}
+    const orders=points.orders(session.account.account);
+    if(path==='/api/v1/orders')json(response,200,orders);
+    else {const order=orders.find(item=>item.id===decodeURIComponent(path.slice('/api/v1/orders/'.length)));json(response,order?200:404,order??{code:'order_not_found'});}
+    return;
+   }
    json(response,503,{code:'service_unavailable'});
   })().catch(()=>json(response,400,{code:'invalid_request'}));});}};
 }

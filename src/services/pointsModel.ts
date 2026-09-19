@@ -6,7 +6,7 @@ export const formatPoints=(balance:number)=>balance>=1e12?`${(balance/1e12).toFi
 export const episodePricing={baseCost:10,freeEpisodes:6,count:36};
 export const topUps:Record<string,number>={'points-60':60,'points-200':200,'points-580':580,'points-1500':1500};
 export interface MonthlyPointsGrant {userId:string;month:string;grantedAmount:number;tierAtGrant:Tier;updatedAt:string}
-export interface PointsTransaction {id:string;type:'monthly_grant'|'check_in'|'top_up'|'episode_unlock'|'refund'|'festival_participation'|'festival_invitation';title:string;amount:number;balanceAfter:number;createdAt:string;activityId?:string;rewardId?:string;invitationId?:string}
+export interface PointsTransaction {id:string;type:'monthly_grant'|'check_in'|'top_up'|'episode_unlock'|'refund'|'festival_participation'|'festival_invitation'|'festival_app'|'festival_recharge'|'festival_recharge_reversal';title:string;amount:number;balanceAfter:number;createdAt:string;activityId?:string;rewardId?:string;invitationId?:string;orderId?:string;reversalStatus?:'complete'|'insufficient_balance';unrecoveredAmount?:number}
 export interface EpisodeUnlock {id:string;contentId:string;episodeId:string;contentTitle:string;episodeTitle:string;coverUrl:string|null;pointsSpent:number;unlockedAt:string;href:string}
 export interface PointsWallet {pointsBalance:number;grants:MonthlyPointsGrant[];checkIns:string[];transactions:PointsTransaction[];unlocks:EpisodeUnlock[];requests:Record<string,string>}
 export interface PointsSummary {balance:number;tier:Tier;monthlyAllowance:number;checkedInToday:boolean;demo:boolean}

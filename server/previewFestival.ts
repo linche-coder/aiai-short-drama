@@ -8,9 +8,9 @@ interface Invitation {id:string;activityId:string;inviter:string;invitee:string;
 export interface FestivalState {users:Record<string,PreviewUser>;codes:Record<string,string>;attributions:Record<string,string>;invitations:Invitation[];rewards:Record<string,FestivalReward[]>}
 export const emptyFestival=():FestivalState=>({users:{},codes:{},attributions:{},invitations:[],rewards:{}});
 export type FestivalLedger={wallets:Record<string,PointsWallet>;festival?:FestivalState};
-export const previewFestivalConfig:FestivalConfig={...festivalConfig,enabled:true};
+export const previewFestivalConfig:FestivalConfig={...festivalConfig};
 export function authenticate(user:PreviewUser|undefined,password:unknown){if(!user||typeof password!=='string'||password.length>64)return false;return timingSafeEqual(Buffer.from(user.hash,'hex'),scryptSync(password,user.salt,64));}
-function reward(state:FestivalLedger,userId:string,kind:FestivalReward['kind'],config:FestivalConfig,invitationId?:string){
+function reward(state:FestivalLedger,userId:string,kind:'participation'|'invitation',config:FestivalConfig,invitationId?:string){
  const f=state.festival??(state.festival=emptyFestival()),records=f.rewards[userId]??(f.rewards[userId]=[]);
  if(records.some(r=>r.activityId===config.id&&r.kind===kind&&(kind==='participation'||r.invitationId===invitationId)))return false;
  const wallet=state.wallets[userId]??(state.wallets[userId]=newWallet()),amount=kind==='participation'?config.participation:config.invitation,id=randomUUID(),transactionId=randomUUID(),createdAt=new Date().toISOString();
@@ -23,7 +23,8 @@ export function festivalSummary(state:FestivalLedger,userId:string|null,config=p
  if(userId&&!f.codes[userId])f.codes[userId]=randomUUID();
  const records=userId?(f.rewards[userId]??[]).filter(r=>r.activityId===config.id):[],participationReward=records.filter(r=>r.kind==='participation').reduce((n,r)=>n+r.amount,0),invitationReward=records.filter(r=>r.kind==='invitation').reduce((n,r)=>n+r.amount,0);
  const invitations=f.invitations.filter(i=>i.inviter===userId&&i.activityId===config.id);
- return {activityId:config.id,phase:festivalPhase(config),startsAt:config.startsAt,endsAt:config.endsAt,demo:true,claimed:records.some(r=>r.kind==='participation'),invitationCode:userId?f.codes[userId]:null,successfulInvites:invitations.length,rewardedInvites:invitations.filter(i=>i.rewarded).length,participationReward,invitationReward,totalReward:participationReward+invitationReward,records};
+ const appReward=records.filter(r=>r.kind==='app').reduce((n,r)=>n+r.amount,0),rechargeReward=records.filter(r=>r.kind==='recharge'||r.kind==='recharge_reversal').reduce((n,r)=>n+r.amount,0);
+ return {activityId:config.id,phase:festivalPhase(config),startsAt:config.startsAt,endsAt:config.endsAt,demo:true,claimed:records.some(r=>r.kind==='participation'),invitationCode:userId?f.codes[userId]:null,successfulInvites:invitations.length,rewardedInvites:invitations.filter(i=>i.rewarded).length,participationReward,invitationReward,appReward,rechargeReward,totalReward:participationReward+invitationReward+appReward+rechargeReward,records};
 }
 export function claimFestival(state:FestivalLedger,userId:string,tier:Tier,config=previewFestivalConfig){
  const current=festivalSummary(state,userId,config);if(current.claimed)return {...current,awarded:false};

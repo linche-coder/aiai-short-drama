@@ -11,7 +11,7 @@ test('所有充值选项保留参考金额，弹层支持 Escape 和焦点恢复
  await expect(page.locator('main')).not.toContainText(/演示|一次性购买|购买说明|AIAI/);
  const choices=[['立即开通','悦享会员','19.9'],['升级尊享','尊享会员','39.9'],['60 积分 ¥6','60 积分','6'],['200 积分 ¥18','200 积分','18'],['580 积分 ¥45','580 积分','45'],['1,500 积分 ¥98','1,500 积分','98'],['悦享年卡','悦享年卡','168'],['尊享年卡','尊享年卡','328']];
  for(const [button,title,price] of choices){
-  const trigger=page.getByRole('button',{name:button,exact:!button.includes('年卡')});
+  const trigger=button.includes('年卡')?page.locator('.recharge-annual').filter({hasText:button}):page.getByRole('button',{name:button,exact:true});
   await trigger.click();
   const dialog=page.getByRole('dialog',{name:title,exact:true});
   await expect(dialog).toBeVisible();
@@ -29,7 +29,7 @@ test('登录和关闭登录均保留所选年卡及剧集回跳，未接入支�
  await page.route('**/api/v1/orders',route=>{orders++;return route.fulfill({status:503,json:{}});});
  await page.route('**/api/v1/auth/sign-in',route=>route.fulfill({json:{subject:'reader',tier:'free',roles:[],expiresAt:null}}));
  await page.goto('/membership?returnTo=%2Fplay%2Fdrama-05%3Fepisode%3Ddemo-7');
- await page.getByRole('button',{name:/尊享年卡/}).click();
+ await page.locator('.recharge-annual').filter({hasText:'尊享年卡'}).click();
  await page.getByRole('link',{name:'登录后继续'}).click();
  await expect(page.getByRole('dialog',{name:'登录注册'})).toBeVisible();
  await page.getByRole('button',{name:'关闭账号窗口'}).click();

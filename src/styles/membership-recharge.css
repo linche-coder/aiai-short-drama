@@ -183,8 +183,23 @@
   .recharge-annual-compare { order: 4; width: 100%; }
   .recharge-annual > svg { margin-left: auto; }
 }
+.recharge-tiers{scroll-margin-top:110px}
+.membership-festival-banner img{width:62px;height:62px;object-fit:contain;pointer-events:none}.membership-festival-banner>span{display:grid;gap:8px;flex:1;min-width:0}.membership-festival-banner strong{font-size:21px;letter-spacing:2px}.membership-festival-banner small{font-size:12px;color:#d2b3b5;line-height:1.8}.membership-festival-banner:hover{border-color:#efc998}
+.membership-festival-bonus{display:block;width:fit-content;margin:12px auto 0;padding:7px 10px;border:1px solid #e1ab6450;border-radius:6px;background:#9b562322;color:#f2cfa1;font-size:11px;line-height:1.5}.membership-festival-bonus b{font-size:15px;color:#ffe0a7}.recharge-annual .membership-festival-bonus{margin:0;font-size:10px}.recharge-annual{flex-wrap:wrap}
+.membership-festival-details{scroll-margin-top:110px;margin:32px 0;padding:30px;border:1px solid #b4825466;border-radius:16px;background:radial-gradient(ellipse at 100% 0,#71384330,transparent 60%),linear-gradient(130deg,#281823,#15101d);text-align:left}.membership-festival-heading>span{font-size:11px;color:#d8a57f;letter-spacing:3px}.membership-festival-heading h2{font-size:26px;color:#ffe0b3;margin:12px 0}.membership-festival-details p{font-size:12px;line-height:1.9;color:#c3aeb9}.membership-festival-offers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:23px 0}.membership-festival-offers>button{display:flex;flex-direction:column;gap:15px;text-align:left;padding:20px 16px;border:1px solid #b9885550;border-radius:9px;background:linear-gradient(140deg,#78392724,#261923);color:#e5c5af;cursor:pointer}.membership-festival-offers>button:hover{border-color:#dca974;background:#713d3433}.membership-festival-offers>button>span{font-size:13px}.membership-festival-offers strong{font-size:30px;color:#f8ce94}.membership-festival-offers strong small{font-size:11px;margin-left:5px}.membership-festival-offers>button>span:last-child{display:flex;align-items:center;gap:4px;font-size:11px;color:#bd9390}.membership-festival-details>.text-button{display:flex;align-items:center;gap:5px;width:fit-content;color:#e4bd91;font-size:12px}
+.purchase-benefit-label{margin-bottom:0!important;font-size:12px;color:#bbaabe}.purchase-festival-bonus{display:grid;gap:8px;margin:22px 0;padding:17px;border:1px solid #bd88594d;border-radius:10px;background:#bd69361a;color:#e9c297}.purchase-festival-bonus span{font-size:13px}.purchase-festival-bonus strong{font-size:27px;color:#ffe0b0}.purchase-festival-bonus small{font-size:11px;color:#c5a6ad}
+@media(max-width:700px){.membership-festival-banner{padding:13px 14px;gap:10px;margin-bottom:28px}.membership-festival-banner img{width:45px;height:45px}.membership-festival-banner strong{font-size:18px}.membership-festival-banner small{font-size:11px}.membership-festival-banner>svg{display:none}.membership-festival-details{padding:23px 18px;scroll-margin-top:90px}.membership-festival-heading h2{font-size:23px}.membership-festival-offers{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.membership-festival-offers>button{padding:16px 12px}.membership-festival-offers strong{font-size:26px}.recharge-annual .membership-festival-bonus{order:5;width:100%;text-align:center;margin-top:4px}.membership-festival-details p{font-size:11px}}
 @media (prefers-reduced-motion: reduce) {
   .recharge-page *, .recharge-page *::before, .recharge-page *::after { animation: none !important; transition: none !important; }
   .recharge-card:hover, .recharge-topup:hover, .recharge-annual:hover { transform: none; }
   .recharge-card:hover .recharge-emblem > svg { transform: none; }
 }
+
+/* Keep each annual plan's name, price and arrow on one stable row. */
+.recharge-annual-options{min-width:0}
+.recharge-annual{display:grid;grid-template-columns:minmax(0,1fr) auto 20px;gap:10px 12px;align-items:center;padding:14px 16px}
+.recharge-annual>svg{margin:0;grid-column:3;grid-row:1}
+.recharge-annual-meta{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.recharge-annual-meta .membership-festival-bonus{order:initial;width:auto;margin:0;white-space:nowrap;font-size:10px;padding:5px 8px}
+.recharge-annual-meta .recharge-annual-compare{order:initial;width:auto;margin:0 0 0 auto;white-space:nowrap;font-size:10px}
+@media(max-width:700px){.recharge-annual{padding:13px 12px;gap:8px}.recharge-annual-meta .membership-festival-bonus{font-size:9px;padding:5px 6px}.recharge-annual-meta .recharge-annual-compare{font-size:9px}}

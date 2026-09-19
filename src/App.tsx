@@ -1,5 +1,6 @@
 import './styles/festival.css';
 import './styles/festival-campaign.css';
+import './styles/festival-refresh.css';
 import {FestivalPage} from './pages/FestivalPage';
 import {PointsPage} from './pages/PointsPage';
 import{lazy,Suspense,useEffect,useRef}from'react';

@@ -5,16 +5,21 @@ import {previewCatalog} from '../src/data/previewCatalog';
 import type {Tier,Content} from '../src/types/content';
 import {authenticate,bindReferral,claimFestival,festivalSummary,registerFestivalUser,previewFestivalConfig,type FestivalState} from './previewFestival';
 import type {FestivalConfig} from '../src/services/festivalModel';
+import {randomUUID} from 'node:crypto';
+import {settleFestivalOrder,type FestivalOrder} from './festivalOrders';
 
 // Development only. One process serializes each complete mutation, then atomically
 // replaces the persisted ledger. No client-provided balance, price or tier is used.
 export function createPreviewPoints(file:string,festivalConfig:FestivalConfig=previewFestivalConfig){
- type State={wallets:Record<string,PointsWallet>;members:Record<string,{tier:Tier;expiresAt:string}>;festival?:FestivalState};
+ type State={wallets:Record<string,PointsWallet>;members:Record<string,{tier:Tier;expiresAt:string}>;festival?:FestivalState;orders?:Record<string,FestivalOrder>};
  let state:State=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{wallets:{},members:{}};
  function commit(next:State){mkdirSync(dirname(file),{recursive:true});writeFileSync(file+'.tmp',JSON.stringify(next),'utf8');renameSync(file+'.tmp',file);state=next;}
  const tierFor=(id:string,fallback:Tier)=>{const member=state.members[id];return member?Date.parse(member.expiresAt)>Date.now()?member.tier:'free':fallback;};
  return {
   member:(id:string)=>state.members[id],tierFor,
+  orders:(userId:string)=>Object.values(state.orders??{}).filter(order=>order.userId===userId).map(order=>({...order,festivalRewards:(state.festival?.rewards[userId]??[]).filter(reward=>reward.orderId===order.id)})),
+  // Server-only refund hook; a verified full refund is required. No public HTTP route.
+  refundOrder(orderId:string){const next=structuredClone(state),order=next.orders?.[orderId];if(!order||!['paid','refunded'].includes(order.status))throw new Error('invalid_order');order.status='refunded';order.refundedAt??=new Date().toISOString();settleFestivalOrder(next,order,festivalConfig);commit(next);},
   authenticate(id:string,password:unknown){const user=state.festival?.users[id];return authenticate(user,password)?user:undefined;},
   register(input:Record<string,unknown>,reserved:string[],attribution?:string){const next=structuredClone(state),user=registerFestivalUser(next,input,reserved,attribution,festivalConfig);commit(next);return user;},
   referral(code:unknown,existing?:string){const next=structuredClone(state),token=bindReferral(next,code,existing);commit(next);return token;},
@@ -30,7 +35,13 @@ export function createPreviewPoints(file:string,festivalConfig:FestivalConfig=pr
     else {
      if(!['joy-month','premium-month','joy-year','premium-year'].includes(offer)||!key||key.length>128)throw new Error('invalid_offer');
      if(wallet.requests[key]&&wallet.requests[key]!==offer)throw new Error('idempotency_conflict');
-     if(!wallet.requests[key]){tier=offer.startsWith('joy')?'basic':'premium';const end=new Date(Math.max(Date.now(),Date.parse(next.members[userId]?.expiresAt||'')||0));end.setUTCMonth(end.getUTCMonth()+(offer.endsWith('year')?12:1));next.members[userId]={tier,expiresAt:end.toISOString()};wallet.requests[key]=offer;grantMonthly(wallet,userId,tier);}
+     if(!wallet.requests[key]){
+      tier=offer.startsWith('joy')?'basic':'premium';const end=new Date(Math.max(Date.now(),Date.parse(next.members[userId]?.expiresAt||'')||0));end.setUTCMonth(end.getUTCMonth()+(offer.endsWith('year')?12:1));next.members[userId]={tier,expiresAt:end.toISOString()};wallet.requests[key]=offer;grantMonthly(wallet,userId,tier);
+      const prices:Record<string,number>={'joy-month':1990,'premium-month':3990,'joy-year':16800,'premium-year':32800};
+      const now=new Date().toISOString(),order:FestivalOrder={id:randomUUID(),userId,offerId:offer,total:prices[offer],currency:'CNY',createdAt:now,paidAt:now,status:'paid'};
+      (next.orders??(next.orders={}))[order.id]=order;
+      settleFestivalOrder(next,order,festivalConfig);
+     }
     }
    }
    const match=path.match(/^\/api\/v1\/contents\/([^/]+)\/episodes\/([^/]+)\/unlock$/);

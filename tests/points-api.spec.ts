@@ -1,3 +1,4 @@
+import {festivalConfig} from '../src/services/festivalModel';
 import {test,expect,request as requests,type APIRequestContext} from '@playwright/test';
 import {createServer,type ViteDevServer} from 'vite';
 import {previewAuth} from '../vite.config';
@@ -7,7 +8,7 @@ import {tmpdir} from 'node:os';
 let server:ViteDevServer,api:APIRequestContext,other:APIRequestContext;
 const account='points-http-free',password=crypto.randomUUID();
 test.beforeAll(async()=>{
- server=await createServer({configFile:false,plugins:[previewAuth([{account,password,nickname:'HTTP积分测试',tier:'free',membership:null},{account:'points-http-other',password,nickname:'隔离测试',tier:'premium',membership:null}],join(mkdtempSync(join(tmpdir(),'aiai-points-api-')),'points.json'))],server:{host:'127.0.0.1',port:5187,strictPort:true}});await server.listen();
+ server=await createServer({configFile:false,plugins:[previewAuth([{account,password,nickname:'HTTP积分测试',tier:'free',membership:null},{account:'points-http-other',password,nickname:'隔离测试',tier:'premium',membership:null}],join(mkdtempSync(join(tmpdir(),'aiai-points-api-')),'points.json'),{...festivalConfig,enabled:false})],server:{host:'127.0.0.1',port:5187,strictPort:true}});await server.listen();
  api=await requests.newContext({baseURL:'http://127.0.0.1:5187'});other=await requests.newContext({baseURL:'http://127.0.0.1:5187'});
  await api.post('/api/v1/auth/sign-in',{data:{account,password}});await other.post('/api/v1/auth/sign-in',{data:{account:'points-http-other',password}});
 });

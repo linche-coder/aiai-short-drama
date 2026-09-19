@@ -1,0 +1,34 @@
+/* Home banner shares the campaign artwork, materials and gold-red controls. */
+.festival-strip{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:24px;height:200px;max-height:200px;min-height:0;margin:28px 0;padding:0 8% 0 16%;overflow:hidden;border:1px solid #b9854e66;border-radius:4px;background:#160d17;box-shadow:0 12px 32px #0003}
+.festival-strip-scene{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.festival-strip-scene>img{position:absolute;left:50%;top:50%;width:min(100%,1900px);max-width:none;height:auto;transform:translate(-50%,-50%);mask-image:linear-gradient(transparent 34%,#000 37%,#000 62%,transparent 65%)}
+.festival-strip:after{content:'';position:absolute;inset:5px;z-index:-1;border:1px solid #e6b57220;pointer-events:none}
+.festival-strip-title{width:300px;height:200px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 1px #ffd99580) drop-shadow(0 2px 3px #ff3b984d);transform:translateY(-14px)}
+.festival-strip .festival-strip-action{display:flex;align-items:center;justify-content:center;gap:16px;min-width:174px;margin:0;padding:17px 24px;border:1px solid #f1cc90;border-radius:0;background:linear-gradient(110deg,#a6502d,#d77c49 48%,#a83c44);box-shadow:inset 0 0 0 4px #f4c0751a;color:#fff0d1;font-size:15px;font-weight:750;letter-spacing:3px;clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px),0 8px);transition:filter .2s}
+.festival-strip:hover .festival-strip-action{filter:brightness(1.15)}
+.festival-strip:focus-visible{outline:3px solid #ffe3ae;outline-offset:4px}
+@media(max-width:1100px){.festival-strip{height:200px;padding:0 5%;gap:20px}.festival-strip-title{width:290px;height:194px;transform:translateY(-12px)}.festival-strip .festival-strip-action{min-width:145px;padding:15px 18px;font-size:13px}}
+@media(max-width:600px){.festival-strip{height:180px;padding:0 12px;gap:10px;margin:22px 0}.festival-strip-title{width:calc(100% - 106px);height:auto;max-width:280px;transform:translateY(-7px)}.festival-strip-scene>img{width:900px;left:35%;opacity:.65}.festival-strip .festival-strip-action{min-width:0;padding:13px 10px;gap:6px;font-size:12px;letter-spacing:1px}.festival-strip .festival-strip-action svg{width:14px}}
+@media(prefers-reduced-motion:reduce){.festival-strip .festival-strip-action{transition:none}}
+.festival-app-visual>img.festival-phone-illustration{width:155px;height:235px;object-fit:contain;margin:0 -15px 0 0;transform:none;filter:drop-shadow(0 12px 12px #08030a66)}
+.festival-app-visual:has(.festival-phone-illustration){height:255px}
+/* Follow the transparent artwork's contours: warm rim light and a soft pink halo. */
+.festival-title-art,
+.festival-page .festival-hero .festival-title-art{
+  filter:drop-shadow(0 0 1px #ffd995a6) drop-shadow(0 1px 2px #ffad544d) drop-shadow(0 2px 3px #ff3b984d) drop-shadow(0 5px 18px #18091466);
+}
+@media(max-width:540px){
+  .festival-title-art,
+  .festival-page .festival-hero .festival-title-art{
+    filter:drop-shadow(0 0 .6px #ffd995a6) drop-shadow(0 .6px 1.2px #ffad544d) drop-shadow(0 1px 1.8px #ff3b984d) drop-shadow(0 5px 18px #18091466);
+  }
+}
+.festival-tasks{grid-template-columns:repeat(2,minmax(0,1fr))}.festival-totals{grid-template-columns:repeat(3,minmax(0,1fr))}
+.festival-app,.festival-recharge-task{display:flex;flex-direction:column}.festival-app>.festival-secondary,.festival-recharge-task>.festival-secondary{margin-top:auto}
+.festival-bonus-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0}.festival-bonus-grid>div{display:grid;gap:10px;padding:18px 16px;border:1px solid #bc835440;background:linear-gradient(130deg,#90433428,#ba72570a);border-radius:8px}.festival-bonus-grid span{font-size:13px;color:#d3b4b6}.festival-bonus-grid strong{font-size:30px;color:#f3ca90}.festival-bonus-grid small{font-size:11px;margin-left:6px;font-weight:400}
+.festival-app-visual{display:flex;align-items:center;justify-content:center;position:relative;height:205px;margin:10px 0 20px;background:radial-gradient(ellipse at 50% 70%,#a9545435,transparent 65%)}.festival-app-visual>img{width:135px;transform:rotate(10deg);margin-left:-28px;z-index:1;pointer-events:none}.festival-phone{width:99px;height:165px;border:2px solid #bb8a65;border-radius:20px;background:linear-gradient(155deg,#482433,#130e1b);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transform:rotate(-9deg);box-shadow:0 15px 25px #0005;color:#f4d3a5}.festival-phone>svg:first-child{width:20px;height:20px}.festival-phone>svg:nth-child(2){color:#d9a36d;width:30px;height:30px}.festival-phone>span{font-family:serif;text-align:center;font-size:17px;letter-spacing:3px;line-height:1.6}
+/* Compact, layered home key visual: landscape, gift and coin occupy their own column. */
+.points-transaction details{font-size:11px;margin-top:8px;color:#b5a2b4;overflow-wrap:anywhere}.points-transaction details p{margin:5px 0}.points-transaction>div:first-child{min-width:0}
+@media(max-width:900px){.festival-tasks{grid-template-columns:1fr}.festival-page .festival-title-copy{gap:10px}.festival-page .festival-calligraphy{font-size:clamp(42px,7vw,65px)}.festival-page .festival-title-reward{font-size:17px}.festival-title-extra{font-size:12px}}
+@media(max-width:700px){.festival-totals{grid-template-columns:repeat(2,minmax(0,1fr))}.festival-title-copy{gap:8px}.festival-title-eyebrow{font-size:10px;letter-spacing:3px}.festival-title-reward{font-size:15px}.festival-title-extra{font-size:11px}.festival-title-date{font-size:10px;padding-top:5px}.adult-festival-slide .festival-calligraphy{font-size:44px}.festival-bonus-grid{gap:10px}.festival-bonus-grid>div{padding:15px 12px}.festival-bonus-grid strong{font-size:26px}}
+@media(max-width:360px){.festival-page .festival-calligraphy{font-size:40px;letter-spacing:5px}.festival-page .festival-title-reward{font-size:14px}.festival-bonus-grid strong{font-size:24px}.festival-bonus-grid small{font-size:10px;margin-left:3px}}

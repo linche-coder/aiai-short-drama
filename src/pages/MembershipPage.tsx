@@ -1,3 +1,6 @@
+import {rechargeBonusFor} from '../services/festivalModel';
+import {festivalService} from '../services/festival';
+import {useFestivalPhase} from '../hooks/useFestivalPhase';
 import {pointsService,pointsError,usePoints} from '../services/points';
 import{useEffect,useRef,useState,useSyncExternalStore,type CSSProperties,type PointerEvent}from'react';
 import{ArrowUpRight,BadgeCheck,CalendarDays,Check,ChevronRight,Crown,Diamond,Headphones,ReceiptText,ShieldCheck,Sparkles}from'lucide-react';
@@ -38,37 +41,41 @@ function moveSpotlight(event:PointerEvent<HTMLElement>){
 
 export function MembershipPage(){
  const account=useSyncExternalStore(accountService.subscribe,accountService.getSnapshot),{route,navigate}=useRouter(),returnTo=route.params.get('returnTo');
+ const phase=useFestivalPhase(),festivalActive=phase==='active';
  const points=usePoints(),[busy,setBusy]=useState(false),[purchaseError,setPurchaseError]=useState(''),purchaseKey=useRef(crypto.randomUUID()),pending=useRef(false);
  const [selected,setSelected]=useState<Offer|null>(()=>offers.find(item=>item.id===route.params.get('offer'))??null);
  useEffect(()=>{purchaseKey.current=crypto.randomUUID();setPurchaseError('');},[selected?.id]);
+ useEffect(()=>{if(route.hash==='#festival-recharge'&&festivalActive){const frame=requestAnimationFrame(()=>document.getElementById('festival-recharge')?.scrollIntoView({behavior:'instant',block:'start'}));return()=>cancelAnimationFrame(frame);}},[route.hash,route.search,account.tier,festivalActive]);
  useEffect(()=>{if(route.params.get('view')==='points')requestAnimationFrame(()=>document.getElementById('points-topup')?.scrollIntoView());},[route.search,account.tier]);
- async function purchase(){if(!selected||pending.current)return;pending.current=true;setBusy(true);setPurchaseError('');try{await pointsService.purchase(selected.id,purchaseKey.current);await accountService.refresh();setSelected(null);if(returnTo)navigate(returnTo);else navigate('/me/points');}catch(e){setPurchaseError(pointsError(e));}finally{pending.current=false;setBusy(false);}}
+ async function purchase(){if(!selected||pending.current)return;pending.current=true;setBusy(true);setPurchaseError('');try{await pointsService.purchase(selected.id,purchaseKey.current);await accountService.refresh();await festivalService.refresh();setSelected(null);if(returnTo)navigate(returnTo);else navigate('/me/points');}catch(e){setPurchaseError(pointsError(e));}finally{pending.current=false;setBusy(false);}}
  useEffect(()=>{track({name:'membership_view',zone:'green',experiment:'A',tier:account.tier},`membership:${route.key}`);},[route.key,account.tier]);
  useEffect(()=>{setSelected(offers.find(item=>item.id===route.params.get('offer'))??null);},[route.search]);
  const purchasePath=(offer:Offer)=>{const params=new URLSearchParams(route.params);params.set('view','plans');params.set('offer',offer.id);return `/membership?${params}`;};
- if(account.status==='authenticated'&&account.tier!=='free'&&route.params.get('view')!=='plans'&&route.params.get('view')!=='points'&&!route.params.has('offer'))return <MemberCenter account={account} returnTo={returnTo}/>;
+ if(account.status==='authenticated'&&account.tier!=='free'&&route.params.get('view')!=='plans'&&route.params.get('view')!=='points'&&!route.params.has('offer')&&route.params.get('campaign')!=='festival'&&route.hash!=='#festival-recharge')return <MemberCenter account={account} returnTo={returnTo}/>;
  return <main className="recharge-page">
   <div className="recharge-universe" aria-hidden="true"><div className="recharge-orbit recharge-orbit-one"/><div className="recharge-orbit recharge-orbit-two"/><div className="recharge-planet"/><div className="recharge-aurora"/>{Array.from({length:24},(_,i)=><i key={i} className="recharge-star" style={{'--x':`${(i*37+7)%100}%`,'--y':`${(i*23+11)%100}%`,'--delay':`${-i*.7}s`,'--size':`${i%4===0?4:2}px`} as CSSProperties}/>)}</div>
   <div className="recharge-content">
    <header className="recharge-heading"><div className="recharge-heading-spark" aria-hidden="true"><Sparkles/></div><h1><span>爱爱短剧</span> 会员方案</h1><p>会员每月送积分，精彩剧集按需解锁</p></header>
-   <section className="recharge-tiers" aria-label="会员方案">
+   <section className="recharge-tiers" id="festival-recharge" aria-label="会员方案">
     {tiers.map((tier,index)=><article key={tier.id} className={`recharge-card recharge-${tier.tone}`} onPointerMove={moveSpotlight} style={{'--index':index} as CSSProperties}>
      {index===1&&<div className="recharge-popular"><Crown size={16} fill="currentColor"/> 最受欢迎</div>}
      <div className="recharge-card-top"><MembershipEmblem level={index}/><h2>{tier.title}</h2></div>
      <div className="recharge-price-area">{tier.original&&<del>¥{tier.original}</del>}<div className="recharge-price"><span>¥</span><strong>{tier.price}</strong>{index>0&&<small>/月</small>}</div></div>
-     <div className="recharge-points">{tier.points}</div>
+     <div className="recharge-points">{tier.points}</div>{festivalActive&&index>0&&<FestivalBonus offerId={tier.id}/>}
      <div className="recharge-card-rule"/>
      <ul>{tier.benefits.map(benefit=><li key={benefit}><span className="recharge-check"><Check size={12} strokeWidth={2.5}/></span>{benefit}</li>)}</ul>
      {index===0?<Link className="recharge-cta" href="/free">{tier.action}<ChevronRight size={18}/></Link>:<button className="recharge-cta" onClick={()=>setSelected(offers[index-1])}>{tier.action}<ChevronRight size={18}/></button>}
     </article>)}
    </section>
+   <section className="recharge-annuals" aria-labelledby="recharge-annual-title"><h2 id="recharge-annual-title"><Sparkles size={19}/>年卡更省</h2><div className="recharge-annual-options">{offers.slice(6).map((offer,index)=><button key={offer.id} onClick={()=>setSelected(offer)} className={`recharge-annual recharge-${offer.tone}`}><span>{offer.title}</span><strong><small>¥</small>{offer.price}<small>/年</small></strong><ChevronRight size={20}/><span className="recharge-annual-meta">{festivalActive&&<FestivalBonus offerId={offer.id}/>}<span className="recharge-annual-compare">按月购买 <s>¥{index===0?'238.8':'478.8'}</s></span></span></button>)}</div></section>
    <section id="points-topup" className="recharge-topups" aria-labelledby="recharge-topup-title"><h2 id="recharge-topup-title">积分不够？<span>按需补充</span></h2><div className="recharge-topup-options">{offers.slice(2,6).map(offer=><button key={offer.id} onClick={()=>setSelected(offer)} className="recharge-topup"><span>{offer.title}</span><strong><small>¥</small>{offer.price}</strong><ChevronRight size={15}/></button>)}</div></section>
-   <section className="recharge-annuals" aria-labelledby="recharge-annual-title"><h2 id="recharge-annual-title"><Sparkles size={19}/>年卡更省</h2><div className="recharge-annual-options">{offers.slice(6).map((offer,index)=><button key={offer.id} onClick={()=>setSelected(offer)} className={`recharge-annual recharge-${offer.tone}`}><span>{offer.title}</span><strong><small>¥</small>{offer.price}<small>/年</small></strong><span className="recharge-annual-compare">按月购买 <s>¥{index===0?'238.8':'478.8'}</s></span><ChevronRight size={20}/></button>)}</div></section>
    <p className="recharge-footnote"><ShieldCheck size={13}/><span>18+专区需完成年龄与地区验证<span className="recharge-note-dot"> · </span><span>已解锁剧集永久保留</span></span></p>
   </div>
-  {selected&&!location.pathname.startsWith('/account/')&&<DialogShell title={selected.title} onClose={()=>setSelected(null)} hideFooterClose><div className={`recharge-purchase recharge-${selected.tone}`}><div className="recharge-purchase-symbol" aria-hidden="true">{selected.period?<Crown/>:<Diamond/>}</div><div className="recharge-price"><span>¥</span><strong>{selected.price}</strong>{selected.period&&<small>/{selected.period}</small>}</div><div className="recharge-points">{selected.points}</div>{account.status==='guest'?<Link className="recharge-cta" href={`/account/login?returnTo=${encodeURIComponent(purchasePath(selected))}`}>登录后继续<ChevronRight size={18}/></Link>:<><p>{points.data?.summary.demo?'本地演示订单，不会发生真实扣款。':'支付服务暂不可用，请稍后再试。'}</p>{purchaseError&&<p role="alert">{purchaseError}</p>}<button className="recharge-cta" disabled={busy||!points.data?.summary.demo} onClick={()=>void purchase()}>{busy?'处理中…':points.data?.summary.demo?'确认演示购买':'支付暂不可用'}</button></>}</div></DialogShell>}
+  {selected&&!location.pathname.startsWith('/account/')&&<DialogShell title={selected.title} onClose={()=>setSelected(null)} hideFooterClose><div className={`recharge-purchase recharge-${selected.tone}`}><div className="recharge-purchase-symbol" aria-hidden="true">{selected.period?<Crown/>:<Diamond/>}</div><div className="recharge-price"><span>¥</span><strong>{selected.price}</strong>{selected.period&&<small>/{selected.period}</small>}</div>{selected.period&&<p className="purchase-benefit-label">会员权益</p>}<div className="recharge-points">{selected.points}</div>{festivalActive&&selected.period&&<div className="purchase-festival-bonus"><span>双节活动加赠</span><strong>{rechargeBonusFor(selected.id)}积分</strong><small>活动期内支付成功后到账，每笔均享</small></div>}{account.status==='guest'?<Link className="recharge-cta" href={`/account/login?returnTo=${encodeURIComponent(purchasePath(selected))}`}>登录后继续<ChevronRight size={18}/></Link>:<><p>{points.data?.summary.demo?'本地演示订单，不会发生真实扣款。':'支付服务暂不可用，请稍后再试。'}</p>{purchaseError&&<p role="alert">{purchaseError}</p>}<button className="recharge-cta" disabled={busy||!points.data?.summary.demo} onClick={()=>void purchase()}>{busy?'处理中…':points.data?.summary.demo?'确认演示购买':'支付暂不可用'}</button></>}</div></DialogShell>}
  </main>;
 }
+
+function FestivalBonus({offerId}:{offerId:string}){return <span className="membership-festival-bonus">双节活动额外赠 <b>{rechargeBonusFor(offerId)}</b> 积分</span>;}
 
 function MemberCenter({account,returnTo}:{account:Account;returnTo:string|null}){
  const membership=account.membership;
