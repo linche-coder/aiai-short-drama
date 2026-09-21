@@ -1,0 +1,30 @@
+.drama-grid,.adult-shell .adult-grid,.adult-shell .related-content .drama-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:18px}
+.content-card,.adult-shell .content-card{display:flex;flex-direction:column;min-width:0;height:100%;overflow:hidden;border:1px solid #ffffff2c;border-radius:18px;background:linear-gradient(155deg,#25263f,#1b1d2d);box-shadow:0 8px 24px #0002;transition:border-color .2s,box-shadow .2s,transform .2s;text-align:left}
+.content-card .card-poster,.adult-shell .content-card .card-poster{display:block;position:relative;flex:none;width:100%;aspect-ratio:3/4;margin:0;border:0;border-radius:0;overflow:hidden;box-shadow:none;background:#242333}
+.adult-shell .content-card .adult-card-art{position:relative;display:block;flex:none;width:100%;aspect-ratio:3/4;border:0;border-radius:0;overflow:hidden;transform:none}
+.adult-shell .content-card .adult-card-art>a{display:block;width:100%;height:100%}
+.adult-shell .content-card .adult-card-art .card-poster{height:100%}
+.adult-shell .content-card .adult-save{top:auto;right:8px;bottom:8px;width:34px;height:34px}
+.adult-shell .content-card .card-episodes{left:8px;right:auto}
+.adult-shell .content-card .content-card-body-link{display:flex;flex:1;min-height:0;margin:0;gap:0}
+.adult-shell .content-card .content-card-title{display:-webkit-box;min-height:2.9em;margin:0;font-size:14px;font-weight:700;line-height:1.45}
+.content-card .poster-image,.content-card .poster-image img{width:100%;height:100%}
+.content-card .poster-image img{object-fit:cover}
+.content-card .card-badges{position:absolute;z-index:2;top:8px;right:8px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;max-width:calc(100% - 16px)}
+.content-card .card-badges>span,.content-card .card-episodes{display:block;padding:4px 7px;border-radius:6px;background:#191522e8;border:1px solid #ffffff66;color:#fff;font-size:11px;font-weight:700;line-height:1.15;box-shadow:0 2px 8px #0008;white-space:nowrap}
+.content-card .card-badges .card-permission{background:#741d64e8;border-color:#f4aad7}
+.content-card .card-badges .card-original{background:#28362beb;border-color:#b2d5b4;color:#e2f6df}
+.content-card .card-episodes{position:absolute;right:8px;bottom:8px;z-index:2}
+.content-card-copy{display:flex;flex:1;flex-direction:column;min-width:0;gap:8px;padding:14px 14px 13px}
+.content-card-title,.content-card-description{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.content-card-title{-webkit-line-clamp:2;min-height:2.9em;color:#f8f5fb;font-size:14px;line-height:1.45;font-weight:700}
+.content-card-description{-webkit-line-clamp:2;min-height:3em;color:#b8acc4;font-size:11px;line-height:1.5}
+.content-card-meta{display:flex;justify-content:space-between;gap:6px;margin-top:auto;color:#a9a0b7;font-size:10px;line-height:1.4}
+.content-card-meta>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(hover:hover) and (pointer:fine){.content-card:hover,.adult-shell .content-card:hover{transform:translateY(-2px);border-color:#d68bb3;box-shadow:0 12px 28px #0005}.content-card:hover .poster-image img{transform:scale(1.015);filter:none}}
+.content-card:focus-visible,.adult-shell .content-card:focus-visible{outline:2px solid #ffaed3;outline-offset:3px;border-color:#ffaed3}
+.adult-shell .content-card:focus-within{outline:2px solid #ffaed3;outline-offset:3px;border-color:#ffaed3}
+@media(max-width:1199px){.drama-grid,.adult-shell .adult-grid,.adult-shell .related-content .drama-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:850px){.drama-grid,.adult-shell .adult-grid,.adult-shell .related-content .drama-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
+@media(max-width:540px){.drama-grid,.adult-shell .adult-grid,.adult-shell .related-content .drama-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.content-card,.adult-shell .content-card{border-radius:12px}.content-card-copy{padding:10px;gap:6px}.content-card-title{font-size:12px}.content-card-description{font-size:10px}.content-card-meta{font-size:9px}.content-card .card-badges>span,.content-card .card-episodes{font-size:9px;padding:3px 5px}}
+@media(prefers-reduced-motion:reduce){.content-card,.adult-shell .content-card,.content-card .poster-image img{transition:none!important}.content-card:hover,.adult-shell .content-card:hover,.content-card:hover .poster-image img{transform:none!important}}

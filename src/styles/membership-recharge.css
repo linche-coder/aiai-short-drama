@@ -21,7 +21,7 @@
 .recharge-heading p { margin: 10px 0 0; color: #bcb3c9; font-size: 15px; letter-spacing: 2px; }
 .recharge-heading-spark { position: absolute; left: calc(50% - 280px); top: 12px; color: #e291d2; transform: rotate(-12deg); filter: drop-shadow(0 0 9px #ff78d6); }
 .recharge-heading-spark svg { width: 24px; height: 24px; }
-.recharge-tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 0 26px; }
+.recharge-tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 0; }
 .recharge-silver { --accent: #ddd6fa; --accent-rgb: 191, 171, 244; }
 .recharge-pink { --accent: var(--recharge-pink, #ff7ccd); --accent-rgb: 255, 105, 198; }
 .recharge-cyan { --accent: var(--recharge-cyan, #7af3ef); --accent-rgb: 94, 228, 234; }

@@ -47,18 +47,18 @@ test('full refunds reverse once, retain history and flag insufficient funds with
  expect(state.wallets.member.pointsBalance).toBe(0);expect(state.wallets.member.transactions[0]).toMatchObject({type:'festival_recharge_reversal',amount:-20,reversalStatus:'insufficient_balance',unrecoveredAmount:2980});
  expect(festivalSummary(state,'member').records).toHaveLength(4);
 });
-test('persisted demo orders ignore client bonus/status/time, retry atomically and refund after restart',()=>{
+test('new membership orders use server-side festival bonus, retry atomically and persist',()=>{
  const file=join(mkdtempSync(join(tmpdir(),'festival-orders-')),'ledger.json'),config={...festivalConfig,startsAt:'2000-01-01T00:00:00Z',endsAt:'2999-01-01T00:00:00Z'},service=createPreviewPoints(file,config);
- const input={offerId:'joy-year',idempotencyKey:'same',amount:900000,paidAt:'2000-01-01',status:'failed'},path='/api/v1/me/points/demo-purchase';
+ const input={offerId:'view-month',idempotencyKey:'same',amount:900000,paidAt:'2000-01-01',status:'failed'},path='/api/v1/me/points/demo-purchase';
  mkdirSync(file+'.tmp');expect(()=>service.run('member','free',path,input)).toThrow();rmSync(file+'.tmp',{recursive:true});
  for(let i=0;i<10;i++)service.run('member','free',path,input);
  expect(service.orders('member')).toHaveLength(1);expect(service.orders('other')).toHaveLength(0);
- expect(service.festival('member').rechargeReward).toBe(1000);
- expect(service.run('member','free','/api/v1/me/points',{}).summary.balance).toBe(1320);
- service.run('member','free',path,{...input,idempotencyKey:'renew'});expect(service.festival('member').rechargeReward).toBe(2000);
- const restored=createPreviewPoints(file,config),id=restored.orders('member')[0].id;restored.refundOrder(id);restored.refundOrder(id);
- expect(restored.festival('member').rechargeReward).toBe(1000);
- const disk=JSON.parse(readFileSync(file,'utf8'));expect(disk.wallets.member.transactions.filter((t:{type:string})=>t.type==='festival_recharge_reversal')).toHaveLength(1);
+ expect(service.orders('member')[0].total).toBe(8800);
+ expect(service.festival('member').rechargeReward).toBe(100);
+ expect(service.run('member','free','/api/v1/me/points',{}).summary.balance).toBe(100);
+ service.run('member','free',path,{...input,idempotencyKey:'renew'});expect(service.orders('member')).toHaveLength(2);expect(service.festival('member').rechargeReward).toBe(200);
+ const restored=createPreviewPoints(file,config);expect(restored.orders('member')).toHaveLength(2);
+ const disk=JSON.parse(readFileSync(file,'utf8'));expect(disk.wallets.member.transactions.filter((t:{type:string})=>t.type==='festival_recharge')).toHaveLength(2);
 });
 
 test.beforeEach(async({page})=>{
@@ -66,7 +66,7 @@ test.beforeEach(async({page})=>{
  await page.addInitScript(()=>sessionStorage.setItem('aiai:intro-seen','yes'));
  await page.emulateMedia({reducedMotion:'reduce'});
 });
-test('App empty link keeps page, scroll and reward state; membership anchor and four offers',async({page})=>{
+test('App empty link keeps page and new membership anchor exposes only two plans',async({page})=>{
  await page.goto('/festival');await expect(page.locator('.festival-tasks>section')).toHaveCount(4);
  await expect(page.locator('.festival-app')).toContainText('50积分');
  const link=page.getByRole('link',{name:'下载App',exact:true});await link.scrollIntoViewIfNeeded();const position=await page.evaluate(()=>scrollY),url=page.url();
@@ -74,16 +74,16 @@ test('App empty link keeps page, scroll and reward state; membership anchor and 
  await link.click();await expect(page.getByRole('status').filter({hasText:'下载页面即将上线'})).toBeVisible();expect(page.url()).toBe(url);expect(Math.abs(await page.evaluate(()=>scrollY)-position)).toBeLessThan(3);expect(mutations).toBe(0);
  await page.getByRole('link',{name:'查看双节充值礼',exact:true}).click();await expect(page).toHaveURL(/campaign=festival#festival-recharge$/);
  await expect(page.locator('#festival-recharge')).toBeInViewport();
- for(const [offerId,bonus] of [['joy-month',100],['premium-month',300],['joy-year',1000],['premium-year',3000]] as const){
-  const index=['joy-month','premium-month','joy-year','premium-year'].indexOf(offerId);await (index<2?page.locator('.recharge-tiers button.recharge-cta').nth(index):page.locator('.recharge-annual').nth(index-2)).click();await expect(page.locator('.purchase-festival-bonus strong')).toHaveText(bonus+'积分');await expect(page.locator('.recharge-purchase .recharge-points')).toHaveText(offerId.startsWith('joy')?'320 积分/月':'960 积分/月');await page.keyboard.press('Escape');
- }
- await page.getByRole('button',{name:'60 积分 ¥6',exact:true}).click();await expect(page.locator('.purchase-festival-bonus')).toHaveCount(0);
+ await expect(page.locator('.membership-festival-bonus')).toHaveCount(2);
+ for(const [title,bonus] of [['畅看月卡','100'],['畅看季卡','300']]){await page.locator('.recharge-tiers button.recharge-cta').nth(title==='畅看月卡'?0:1).click();await expect(page.getByRole('dialog',{name:title})).toBeVisible();await expect(page.locator('.purchase-festival-bonus')).toContainText(bonus+' 积分');await page.keyboard.press('Escape');}
+ await expect(page.locator('.membership-more-plans')).toHaveCount(0);
+ await page.locator('.membership-credit-cta').first().click();await expect(page.locator('.purchase-festival-bonus')).toHaveCount(0);
 });
-test('active membership campaign works for existing members; automatically hides at end',async({page})=>{
+test('active membership campaign link still reaches current cards and ends on schedule',async({page})=>{
  await page.route('**/api/v1/session',r=>r.fulfill({json:{subject:'existing-member',tier:'premium',roles:[],expiresAt:null}}));
  await page.goto('/membership?campaign=festival#festival-recharge');await expect(page.locator('#festival-recharge')).toBeInViewport();
- await page.clock.install({time:new Date('2026-10-07T23:59:59+08:00')});await page.reload();await expect(page.locator('.membership-festival-bonus')).toHaveCount(4);await page.clock.runFor(1100);
- await expect(page.locator('.membership-festival-banner')).toHaveCount(0);await expect(page.locator('.membership-festival-bonus')).toHaveCount(0);await expect(page.locator('#festival-recharge')).toBeVisible();
+ await page.clock.install({time:new Date('2026-10-07T23:59:59+08:00')});await page.reload();await expect(page.locator('.membership-festival-bonus')).toHaveCount(2);await page.clock.runFor(1100);
+ await expect(page.locator('.membership-festival-bonus')).toHaveCount(0);await expect(page.locator('#festival-recharge')).toBeVisible();
  await page.goto('/festival');await expect(page.locator('.festival-status')).toHaveText('活动已结束');await expect(page.locator('.festival-primary')).toBeDisabled();
 });
 test('home, festival and membership responsive visual checks, accessible entry and reduced motion',async({page})=>{

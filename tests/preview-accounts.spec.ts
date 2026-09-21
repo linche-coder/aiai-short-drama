@@ -14,9 +14,9 @@ for(const candidate of accounts)test(`${candidate.kind}可通过正式登录弹�
  await page.getByPlaceholder('请输入密码').fill(candidate.password!);
  await page.getByRole('button',{name:'登录',exact:true}).last().click();
  await expect(page).toHaveURL(/\/membership$/);
- if(candidate.avatar==='member')await expect(page.getByRole('heading',{name:'我的会员权益'})).toBeVisible();else await expect(page.getByRole('heading',{name:'爱爱短剧 会员方案'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'爱爱短剧 畅看会员'})).toBeVisible();
  await page.reload();
- if(candidate.avatar==='member')await expect(page.locator('.member-center .member-tier')).toBeVisible();else await expect(page.getByRole('heading',{name:'爱爱短剧 会员方案'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'爱爱短剧 畅看会员'})).toBeVisible();
  await page.goto('/me');
  await expect(page.getByRole('heading',{name:candidate.account!,exact:true})).toBeVisible();
  await expect(page.getByText(/体验账号/)).toHaveCount(0);
@@ -35,10 +35,10 @@ for(const candidate of accounts)test(`${candidate.kind}可通过正式登录弹�
   expect(Math.abs(profileNavWidth-historyNavWidth)).toBeLessThanOrEqual(1);
  }else{
   await page.locator('header').getByRole('link',{name:'会员中心'}).click();
-  await expect(page.locator('.member-center .member-tier')).toBeVisible();
-  await expect(page.getByRole('heading',{name:'我的会员权益'})).toBeVisible();
+  await expect(page.locator('.membership-account .membership-status')).toContainText('尊享会员');
+  await expect(page.getByRole('heading',{name:'爱爱短剧 畅看会员'})).toBeVisible();
   await page.screenshot({path:'docs/auth-modal/member-center-desktop-1440.png',fullPage:true});
   await page.setViewportSize({width:390,height:844});await page.reload();expect(await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)).toBeLessThanOrEqual(1);await page.screenshot({path:'docs/auth-modal/member-center-mobile-390.png',fullPage:true});
-  await page.goto('/me');await page.locator('.account-links a[href="/membership"]').click();await expect(page.locator('.member-center .member-tier')).toBeVisible();
+  await page.goto('/me');await page.locator('a[href="/membership"]').first().click();await expect(page.locator('.membership-account .membership-status')).toContainText('尊享会员');
  }
 });

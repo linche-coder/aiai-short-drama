@@ -1,0 +1,5 @@
+import {PageHeading} from '../components/content/PageParts';
+import {Link} from '../navigation/Router';
+import '../styles/membership-guide.css';
+
+export function MembershipGuidePage(){return <main className="container page narrow-page"><PageHeading title="会员说明" description="服务规则沿用本项目现有用户协议。"/><article className="surface-panel policy-copy"><section><h2>账号与隐私</h2><p>邮箱用于登录，目前不进行邮箱验证或邮件找回。登录后的收藏保存在账号中；发布的评论及昵称会公开展示。旧版本保存在当前浏览器的关注记录不会自动上传到账号。</p></section><section><h2>会员与付费</h2><p>短剧免费集直接观看；免费用户付费单集 5 永久积分。畅看月卡有效期 30 天，季卡有效期 90 天，永久会员无到期日；实际价格以会员中心的服务端报价和购买前确认页为准。有效权益内免积分观看并可访问漫剧；18+ 内容仍需确认年满18周岁。月卡、季卡签到可领取会员积分，按 20/50/100 分兑换 1/3/7 天；永久会员无需兑换时长，既有会员积分余额与记录保留。永久积分包可重复购买，永不过期，不能替代会员专区权限。历史基础会员权益保留至到期。符合资格的账号可手动领取一次 24 小时体验，无需支付、不自动扣款、不赠送积分；已开通限时会员领取后有效期增加一天，永久会员无需领取。</p></section><div className="membership-guide-links"><Link className="secondary-button" href="/membership">查看当前畅看方案</Link><Link className="secondary-button" href="/terms">查看完整用户协议</Link><Link className="secondary-button" href="/privacy">查看隐私说明</Link></div></article></main>;}

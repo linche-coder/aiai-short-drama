@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState,type ReactNode} from 'react';
+﻿import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {ShieldCheck,ArrowLeft,ArrowRight,LockKeyhole} from 'lucide-react';
 import {accessService} from '../services/access';
 import {useAccess,useContents} from '../services/hooks';
@@ -13,10 +13,10 @@ import {AdultCards} from '../adult/AdultCards';
 import {AdultHero} from '../adult/AdultHero';
 import {useReadyScroll} from '../navigation/useReadyScroll';
 export function AdultBoundary({children}:{children:ReactNode}){
- const {navigate}=useRouter();useAccess();const confirmed=accessService.isConfirmed();
+ const {navigate}=useRouter(),access=useAccess(),[ageConfirmed,setAgeConfirmed]=useState(false);const confirmed=access.granted;
  useEffect(()=>{if(confirmed)return;const key=(e:KeyboardEvent)=>{if(e.key==='Escape')navigate('/#home');};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[confirmed]);
  if(confirmed)return <AdultLayout qualified>{children}</AdultLayout>;
- return <div className="adult-shell adult-consent-shell"><main className="gate-page"><section className="gate-card" aria-labelledby="adult-consent-title"><span className="gate-symbol"><ShieldCheck size={32}/></span><h1 id="adult-consent-title">进入18+专区</h1><p>本专区仅面向已满18周岁的用户。点击「确认并进入」，即表示你确认已满18周岁并主动进入。</p><button className="primary-button" onClick={()=>accessService.confirm()}>确认并进入</button><button className="secondary-button" onClick={()=>navigate('/#home')}><ArrowLeft size={16}/>返回普通区</button></section></main></div>;
+ return <div className="adult-shell adult-consent-shell"><main className="gate-page"><section className="gate-card" aria-labelledby="adult-consent-title"><span className="gate-symbol"><ShieldCheck size={32}/></span><h1 id="adult-consent-title">进入18+专区</h1><p>本专区仅面向已满 18 周岁的用户。请确认年龄后主动进入。</p><label className="age-confirm"><input type="checkbox" checked={ageConfirmed} onChange={e=>setAgeConfirmed(e.target.checked)}/>我已年满18周岁</label><button className="primary-button" disabled={!ageConfirmed} onClick={()=>void accessService.enter(ageConfirmed,true)}>确认并进入</button><button className="secondary-button" onClick={()=>navigate('/#home')}><ArrowLeft size={16}/>返回普通区</button></section></main></div>;
 }
 export const adultContext:AccessContext={zone:'adult',channel:'preview',adultGranted:true,region:null,tier:'free',sessionVerified:false};
 function useCatalogColumns(){

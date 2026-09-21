@@ -26,7 +26,7 @@ function WatchPage({drama,adult,items}:{drama:Content;adult:boolean;items:Conten
  const demos=useMemo(()=>demoEpisodes(drama,adult&&accessService.isGranted()),[drama,adult]);const isDemo=demos.length>0;
  const formal=drama.format==='article'?[]:playableEpisodes(drama.media);const episodes=isDemo?demos:formal;
  const points=usePoints();
- const isUnlocked=(index:number)=>!!episodes[index]&&((episodes[index].pointsCost??0)===0||!!points.data?.unlocks.some(u=>u.contentId===drama.id&&u.episodeId===episodes[index].id));
+ const isUnlocked=(index:number)=>!!episodes[index]&&((episodes[index].pointsCost??0)===0||!!points.data&&points.data.summary.tier!=='free'||!!points.data?.summary.trialActive||!!points.data?.unlocks.some(u=>u.contentId===drama.id&&u.episodeId===episodes[index].id));
  const current=episodes[episode],context=adult?adultContext:greenContext,decision=playbackDecision(drama,context);
  const allowed=isDemo?isUnlocked(episode):decision.allowed&&isUnlocked(episode);
  const sources=isDemo?usableSources(current?.sources):usableSources(formal.length?current?.sources:drama.media?.sources);

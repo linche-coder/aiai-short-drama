@@ -1,0 +1,5 @@
+:root{--header-control-radius:7px}
+.site-header .search-box,.site-header .check-in-header-link,.site-header .header-actions .membership-button{border-radius:var(--header-control-radius)}
+.site-header .check-in-header-link,.site-header .header-actions .membership-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;height:44px;border:1px solid var(--line);padding:0 11px;box-sizing:border-box}
+.site-header .check-in-header-link:focus-visible,.site-header .header-actions .membership-button:focus-visible,.site-header .search-box:focus-within{outline:2px solid #ff9bbf;outline-offset:2px;border-color:#ff9bbf}
+@media(max-width:800px){.site-header .check-in-header-link,.site-header .header-actions .membership-button{width:44px;min-width:44px;padding:0}}

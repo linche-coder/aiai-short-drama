@@ -1,0 +1,30 @@
+.membership-free-note{margin:0 0 18px;padding:0 2px;color:#bcb2c3;font-size:13px;line-height:1.65}
+.membership-plan-error{padding:16px;border:1px solid #dd7494;border-radius:10px;color:#ffd5e2}
+.membership-layout .recharge-tiers{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
+.membership-layout .recharge-card,.membership-layout .recharge-card:last-child{grid-column:auto;min-width:0;padding:22px;align-items:stretch}
+.membership-layout .recharge-card-top{text-align:center}
+.membership-layout .recharge-card h2{margin:0;color:#f9f4fd;font-size:23px}
+.plan-position{display:inline-block;margin:8px 0 0;padding:4px 12px;border:1px solid #ffffff30;border-radius:99px;color:#c7b9cf;font-size:11px}
+.membership-layout .recharge-card.recharge-silver{--accent:#cbbbef;--accent-rgb:203,187,239}
+.membership-layout .recharge-card.recharge-pink{--accent:#f49acb;--accent-rgb:244,154,203}
+.membership-layout .recharge-card.recharge-cyan{--accent:#99e3e7;--accent-rgb:153,227,231}
+/* The three tiers share one surface and button treatment; only their accent hue changes. */
+.membership-layout .recharge-card:is(.recharge-silver,.recharge-pink,.recharge-cyan){border-color:rgba(var(--accent-rgb),.38);background:radial-gradient(ellipse at 50% 0%,rgba(var(--accent-rgb),.085),transparent 58%),linear-gradient(155deg,#191820,#11141c);box-shadow:inset 0 1px 0 #ffffff09,0 20px 45px #0003}
+.membership-layout .recharge-card.recharge-pink::after{content:none}
+.membership-layout .recharge-card .recharge-cta,.membership-layout .recharge-card.recharge-pink .recharge-cta{margin-top:auto;border-color:rgba(var(--accent-rgb),.52);background:rgba(var(--accent-rgb),.08);box-shadow:inset 0 1px 0 #ffffff09}
+.membership-layout .recharge-card.recharge-pink .recharge-cta::before{content:none}
+.membership-layout .recharge-card .recharge-price{color:var(--accent)}
+.membership-layout .recharge-card .recharge-points{padding-inline:12px;border-color:rgba(var(--accent-rgb),.35);background:rgba(var(--accent-rgb),.045);color:var(--accent)}
+.membership-layout .plan-position{border-color:rgba(var(--accent-rgb),.36);color:var(--accent)}
+.membership-layout .recharge-card .recharge-price-area{padding-top:23px}
+.membership-layout .recharge-card .recharge-price{white-space:normal}
+.membership-layout .recharge-card .recharge-price>strong{font-size:clamp(42px,4vw,57px)}
+.membership-layout .recharge-card .recharge-price>small{font-size:15px;white-space:nowrap}
+.membership-layout .recharge-card .recharge-points{font-size:11px;text-align:center;line-height:1.45;max-width:100%;white-space:normal}
+.membership-layout .recharge-card ul{margin-top:20px}
+.membership-layout .recharge-card li{font-size:13px}
+.membership-layout .recharge-emblem{width:186px;height:124px;margin:-8px auto 6px;filter:none}
+@media(hover:hover) and (pointer:fine){.membership-layout .recharge-card:hover{transform:translateY(-3px);box-shadow:0 0 25px rgba(var(--accent-rgb),.12),0 22px 45px #0004}.membership-layout .recharge-card .recharge-cta:hover{background:rgba(var(--accent-rgb),.16);box-shadow:0 0 20px rgba(var(--accent-rgb),.13)}}
+@media(max-width:1000px){.membership-layout .recharge-tiers{grid-template-columns:repeat(2,minmax(0,1fr))}.membership-layout .recharge-card:last-child{grid-column:1 / -1}}
+@media(max-width:650px){.membership-layout .recharge-tiers{grid-template-columns:minmax(0,1fr)}.membership-layout .recharge-card:last-child{grid-column:auto}.membership-layout .recharge-emblem{width:150px;height:100px;margin:-6px auto 4px}}
+@media(prefers-reduced-motion:reduce){.membership-layout .recharge-card::before,.membership-layout .recharge-card::after{animation:none!important;transition:none!important}}

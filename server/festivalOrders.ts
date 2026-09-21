@@ -8,6 +8,7 @@ export interface FestivalOrder {
  id:string;userId:string;offerId:string;createdAt:string;total?:number;currency?:'CNY';
  status:'pending'|'processing'|'paid'|'failed'|'cancelled'|'closed'|'refunded';
  paidAt?:string;refundedAt?:string;
+ validity?:'fixed'|'permanent';durationDays?:number|null;entitlementExpiresAt?:string|null;
 }
 export function settleFestivalOrder(state:FestivalLedger,order:FestivalOrder,config:FestivalConfig=festivalConfig){
  const f=state.festival??(state.festival=emptyFestival());

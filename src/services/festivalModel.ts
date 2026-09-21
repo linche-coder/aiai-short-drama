@@ -12,8 +12,9 @@ const beijingDate=(value:string)=>new Date(Date.parse(value)+8*3600000).toISOStr
 const formatDate=(time:number)=>{const value=new Date(time+8*3600000).toISOString();const [year,month,day]=value.slice(0,10).split('-').map(Number);return `${year}年${month}月${day}日${value.slice(11,19)}`;};
 export const festivalDates={short:`${beijingDate(festivalConfig.startsAt).slice(5).replace('-','.')} — ${beijingDate(new Date(Date.parse(festivalConfig.endsAt)-1000).toISOString()).slice(5).replace('-','.')}`,full:`${formatDate(Date.parse(festivalConfig.startsAt))}至${formatDate(Date.parse(festivalConfig.endsAt)-1000)}（北京时间）`};
 export const festivalRechargePath='/membership?campaign=festival#festival-recharge';
-export const festivalOffers=[{id:'joy-month',name:'悦享月卡',key:'joyMonth'},{id:'premium-month',name:'尊享月卡',key:'premiumMonth'},{id:'joy-year',name:'悦享年卡',key:'joyYear'},{id:'premium-year',name:'尊享年卡',key:'premiumYear'}] as const;
-export function rechargeBonusFor(offerId:string,config=festivalConfig){const offer=festivalOffers.find(item=>item.id===offerId);return offer?config.rechargeBonus[offer.key]:0;}
+export const festivalOffers=[{id:'view-month',name:'畅看月卡',key:'joyMonth'},{id:'view-quarter',name:'畅看季卡',key:'premiumMonth'}] as const;
+const historicOffers=[{id:'joy-month',key:'joyMonth'},{id:'premium-month',key:'premiumMonth'},{id:'joy-year',key:'joyYear'},{id:'premium-year',key:'premiumYear'}] as const;
+export function rechargeBonusFor(offerId:string,config=festivalConfig){const offer=[...festivalOffers,...historicOffers].find(item=>item.id===offerId);return offer?config.rechargeBonus[offer.key]:0;}
 export const festivalRewardNames={participation:'双节活动参与奖励',invitation:'双节活动邀请奖励',app:'双节活动App专享奖励',recharge:'双节会员充值加赠',recharge_reversal:'双节充值奖励回收'};
 export type FestivalPhase='upcoming'|'active'|'ended';
 export type FestivalConfig=typeof festivalConfig;

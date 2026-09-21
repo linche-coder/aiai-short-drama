@@ -1,7 +1,7 @@
 ﻿import type { AccessContext, Content, ContentZone, Rights, Tier, Campaign } from '../types/content';
 import { hasPlayableMedia } from '../data/media';
 export type Issue = { field: string; message: string };
-export const tierIncludes = (owned: Tier, needed: string) => needed!=='coin_reserved' && (['free','basic','premium'].indexOf(owned) >= ['free','basic','premium'].indexOf(needed)) && ['free','basic','premium'].includes(needed);
+export const tierIncludes = (owned: Tier, needed: string) => needed!=='coin_reserved' && ['free','basic','premium'].includes(needed) && (needed==='free'||owned!=='free');
 export const hasBaseBenefits = (tier: Tier) => tierIncludes(tier,'basic');
 export function validRights(rights: Rights | null | undefined, regions: string[], now=Date.now(), verifiedProofs: readonly Rights[] = [], scope='stream') {
   const verified=verifiedProofs.find(proof=>proof.proof_id===rights?.proof_id);
@@ -31,7 +31,7 @@ export function canSee(item: Content, context: AccessContext) {
   if(context.channel==='preview'&&item.is_demo)return item.format!=='article' && item.publication_status!=='offline';
   return item.publication_status==='published'&&!item.is_demo&&validatePublication(item,context.approvedSeries??[],Date.now(),context.verifiedRights??[]).length===0&&!!context.region&&item.region_allowlist.includes(context.region);
 }
-export const planBenefits=(tier:Tier)=>({adFree:hasBaseBenefits(tier),quality:hasBaseBenefits(tier)?'hd' as const:'standard' as const,includesBasic:hasBaseBenefits(tier),includesPremium:tier==='premium'});
+export const planBenefits=(tier:Tier)=>({adFree:hasBaseBenefits(tier),quality:hasBaseBenefits(tier)?'hd' as const:'standard' as const,includesBasic:hasBaseBenefits(tier),includesPremium:hasBaseBenefits(tier)});
 export function contentEntitlement(item:Content,context:AccessContext){
  const authorized=canSee(item,context)&&context.sessionVerified&&!!context.region&&item.region_allowlist.includes(context.region)&&validRights(item.rights,item.region_allowlist,Date.now(),context.verifiedRights??[],item.format==='article'?'read':'stream');
  const included=authorized&&tierIncludes(context.tier,item.access_tier);

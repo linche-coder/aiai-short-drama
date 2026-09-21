@@ -1,0 +1,53 @@
+.member-redemption{scroll-margin-top:96px;min-width:0;margin:36px 0;padding:30px 34px;border:1px solid #75b9c35c;border-radius:22px;background:linear-gradient(135deg,#132428,#161b27 58%,#1d1726)}
+.member-redemption-heading{display:flex;align-items:center;justify-content:space-between;gap:26px}
+.member-redemption h2{display:flex;align-items:center;gap:12px;margin:0 0 12px;color:#e9fdff;font-size:26px}
+.member-redemption h2 svg{color:#92f3f0}
+.member-redemption-heading p{max-width:680px;margin:0;color:#b9c9cd;line-height:1.7}
+.member-redemption-balance{display:grid;gap:5px;flex:none;padding:16px 25px;border:1px solid #a9e8e852;border-radius:14px;background:#102a30;text-align:right}
+.member-redemption-balance strong{font-size:30px;color:#a6fcfa;overflow-wrap:anywhere}
+.member-redemption-balance small{color:#9eb7bc}
+.member-redemption-tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:26px 0}
+.member-redemption-tiers article{display:flex;flex-direction:column;gap:10px;min-width:0;padding:22px;border:1px solid #ffffff28;border-radius:15px;background:#ffffff08}
+.member-redemption-tiers strong{color:#aff8f6}
+.member-redemption-duration{font-size:18px}
+.member-redemption-duration strong{font-size:26px}
+.member-redemption-tiers button,.member-redemption-shortfall{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;margin-top:auto;border-radius:9px;font-weight:700;text-align:center}
+.member-redemption-tiers button{border:1px solid #a4e8e8;background:#1b5962;color:#e5ffff;cursor:pointer;transition:background .18s ease,transform .18s ease,box-shadow .18s ease}
+.member-redemption-tiers button:hover{background:#267783;transform:translateY(-1px);box-shadow:0 8px 22px #0a555866}
+.member-redemption-tiers button:focus-visible{outline:3px solid #d3ffff;outline-offset:3px}
+.member-redemption-tiers button:active{transform:translateY(1px);box-shadow:none}
+.member-redemption-shortfall{border:1px dashed #ffffff30;background:#ffffff05;color:#aab5b8;font-weight:500}
+.member-redemption-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#9cb6bb;font-size:13px}
+.member-redemption-footer span,.member-redemption-footer a{display:inline-flex;align-items:center;gap:7px}
+.member-redemption-footer a{min-height:44px;color:#a8f2ef}
+.member-redemption-success{margin:14px 0 0;color:#baf4d2;overflow-wrap:anywhere}
+.member-redemption-confirm{min-width:min(480px,calc(100vw - 64px));color:#ddd}
+.member-redemption-confirm dl{display:grid;gap:12px;margin:22px 0}
+.member-redemption-confirm dl>div{display:flex;justify-content:space-between;gap:20px;border-bottom:1px solid #ffffff1c;padding-bottom:10px}
+.member-redemption-confirm dt{color:#aaa}
+.member-redemption-confirm dd{margin:0;text-align:right;overflow-wrap:anywhere}
+.member-redemption-confirm dd small{display:block;color:#aaa}
+.member-redemption-confirm [role=alert]{color:#f6a9b8}
+.member-redemption-confirm-actions{display:flex;justify-content:flex-end;gap:10px}
+.member-redemption-compact{margin:20px 0 0;padding:18px 0 0;border:0;border-top:1px solid #ffffff24;border-radius:0;background:none}
+.member-redemption-compact-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.member-redemption-compact-title{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 15px;min-width:0}
+.member-redemption-compact-title>span{color:#a9c6c7;font-size:12px;overflow-wrap:anywhere}
+.member-redemption-compact-title>span strong{color:#b5fbf4;font-variant-numeric:tabular-nums}
+.member-redemption-compact h3{margin:0;color:#e9fdff;font-size:17px}
+.member-redemption-compact-heading a{display:inline-flex;align-items:center;gap:5px;min-height:44px;color:#a8f2ef;font-size:12px}
+.member-redemption-compact-note{margin:0;color:#b5c9c9;font-size:12px;line-height:1.6}
+.member-redemption-compact .member-redemption-tiers{gap:9px;margin:14px 0 0}
+.member-redemption-compact .member-redemption-tiers article{gap:5px;padding:14px}
+.member-redemption-compact .member-redemption-duration{font-size:13px}
+.member-redemption-compact .member-redemption-duration strong{font-size:21px}
+.member-redemption-compact .member-redemption-tiers article>span:nth-child(2){font-size:12px}
+.member-redemption-compact .member-redemption-tiers button,.member-redemption-compact .member-redemption-shortfall{min-height:40px;margin-top:10px;font-size:12px}
+.check-in-mode{color:#ccb6c8;font-size:12px;line-height:1.6}
+.member-check-in-highlight{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin:20px 0;padding:19px 20px;border:1px solid #89ddd85c;border-radius:14px;background:#16383d88;color:#aff4ef}
+.member-check-in-highlight strong{font-size:20px}
+.member-check-in-highlight span{color:#bdd4d4;font-size:12px}
+@media(max-width:800px){.member-redemption-tiers{grid-template-columns:repeat(2,minmax(0,1fr))}.member-redemption-heading{align-items:flex-start}.member-redemption-balance{padding:14px}.member-redemption-compact .member-redemption-tiers{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:570px){.member-redemption{padding:22px 18px}.member-redemption-heading{flex-direction:column}.member-redemption-balance{width:100%;text-align:left}.member-redemption-tiers,.member-redemption-compact .member-redemption-tiers{grid-template-columns:1fr}.member-redemption-tiers article{padding:18px}.member-redemption-footer{align-items:flex-start;flex-direction:column}.member-redemption-compact{padding:18px 0 0}.member-redemption-compact-heading{align-items:flex-start;flex-direction:column;gap:2px}.member-redemption-compact .member-redemption-tiers article{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px}.member-redemption-compact .member-redemption-tiers button,.member-redemption-compact .member-redemption-shortfall{grid-column:2;grid-row:1 / span 2;margin:0;min-width:112px}.member-redemption-confirm dl>div{display:block}.member-redemption-confirm dd{text-align:left;margin-top:5px}.member-redemption-confirm-actions{flex-direction:column-reverse}.member-redemption-confirm-actions button{width:100%}}
+@media(max-width:350px){.member-redemption-compact .member-redemption-tiers article{grid-template-columns:1fr}.member-redemption-compact .member-redemption-tiers button,.member-redemption-compact .member-redemption-shortfall{grid-column:1;grid-row:auto;width:100%}}
+@media(prefers-reduced-motion:reduce){.member-redemption-tiers button{transition:none}}

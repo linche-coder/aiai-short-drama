@@ -1,7 +1,7 @@
 import {festivalAccessibleLabel,festivalEntryLabel} from '../services/festivalModel';
 import {FestivalArtwork,festivalAssets} from './FestivalArtwork';
 import { memo, useLayoutEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Content } from '../types/content';
 import { timing } from '../config';
 import { Poster } from './Poster';
@@ -112,7 +112,6 @@ function CarouselTrack({items,initialIndex=0,initialId,initialPaused=false,reduc
       {items.length>1&&<><button className="carousel-arrow previous" aria-label="上一部短剧" onClick={()=>manual(target.current-1)}><ChevronLeft /></button>
       <button className="carousel-arrow next" aria-label="下一部短剧" onClick={()=>manual(target.current+1)}><ChevronRight /></button></>}
     </div>
-    {items.length>1&&<div className="carousel-controls"><span className="slide-number" aria-live={paused?'polite':'off'}>{String(index+1).padStart(2,'0')}<i>/</i><span>{String(items.length).padStart(2,'0')}</span></span><div className="carousel-dots" aria-label="选择轮播位置">{items.map((item,i)=><button key={item.id} className={i===index?'selected':''} aria-label={`第${i+1}部：${item.title}`} aria-pressed={i===index} onClick={()=>manual(i)} />)}</div><button className="autoplay-button" aria-label={paused?'继续自动轮播':'暂停自动轮播'} aria-pressed={paused} disabled={reduced} onClick={()=>{setPaused(!paused);pauseRef.current=!paused;persist(index,!paused);}}>{paused||reduced?<Play size={12}/>:<Pause size={12}/>}<span>{reduced?'手动':paused?'继续':'暂停'}</span></button></div>}
     </div>
   </section>;
 }

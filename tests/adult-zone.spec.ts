@@ -4,18 +4,16 @@ const out='docs/adult/screenshots';fs.mkdirSync(out,{recursive:true});
 async function enter(page:Page,url='/18plus'){
  await page.addInitScript(()=>sessionStorage.setItem('aiai:intro-seen','yes'));
  await page.goto(url);await expect(page.getByRole('heading',{name:'进入18+专区',exact:true})).toBeVisible();
- await page.getByText('本地流程演示',{exact:true}).click();await page.getByLabel('地区流程场景').selectOption('allowed');
- await expect(page.getByText('地区访问检查通过',{exact:true})).toBeVisible();await page.getByLabel('我已年满18周岁').check();await page.getByRole('button',{name:'确认并进入',exact:true}).click();
- await expect(page.locator('.adult-nav')).toBeVisible();await expect(page.locator('.loading-state')).toHaveCount(0);
+ await page.getByLabel('我已年满18周岁').check();await page.getByRole('button',{name:'确认并进入',exact:true}).click();
+ await expect(page.locator('.adult-card').first()).toBeVisible();await expect(page.locator('.loading-state')).toHaveCount(0);
 }
-test('gate: no early data, unknown / denied / error and refresh fail closed',async({page})=>{
+test('gate: age confirmation only, no early data, and cleared consent fail closed',async({page})=>{
  const requests:string[]=[];page.on('request',r=>requests.push(r.url()));await page.goto('/18plus/play/private-preview-1');
- await expect(page.getByText('目前无法确认访问地区')).toBeVisible();expect(requests.some(r=>r.includes('/dev/adultPreview')||r.includes('/dev/assets/'))).toBe(false);
- await expect(page.getByLabel('我已年满18周岁')).not.toBeChecked();await expect(page.getByRole('button',{name:'确认并进入',exact:true})).toBeDisabled();await page.screenshot({path:`${out}/gate-unknown.png`,fullPage:true});
- await page.getByText('本地流程演示',{exact:true}).click();
- for(const [value,text] of [['denied','此访问地区暂不开放'],['error','地区检查未完成，请重试']]){await page.getByLabel('地区流程场景').selectOption(value);await expect(page.getByText(text,{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'确认并进入',exact:true})).toBeDisabled();await page.screenshot({path:`${out}/gate-${value}.png`,fullPage:true});}
- await page.getByRole('button',{name:'重试地区检查'}).click();await expect(page.getByText('地区检查未完成，请重试',{exact:true})).toBeVisible();await page.keyboard.press('Escape');await expect(page).toHaveURL(/\/#home$/);await expect(page.locator('.adult-shell')).toHaveCount(0);
- await enter(page);await page.reload();await expect(page.getByRole('heading',{name:'进入18+专区',exact:true})).toBeVisible();await expect(page.locator('.adult-card')).toHaveCount(0);
+ expect(requests.some(r=>r.includes('/dev/adultPreview')||r.includes('/dev/assets/'))).toBe(false);
+ await expect(page.getByLabel('我已年满18周岁')).not.toBeChecked();await expect(page.getByRole('button',{name:'确认并进入',exact:true})).toBeDisabled();await expect(page.getByText('地区')).toHaveCount(0);await page.screenshot({path:`${out}/gate-age-only.png`,fullPage:true});
+ await page.getByLabel('我已年满18周岁').check();await expect(page.getByRole('button',{name:'确认并进入',exact:true})).toBeEnabled();await page.getByLabel('我已年满18周岁').uncheck();await expect(page.getByRole('button',{name:'确认并进入',exact:true})).toBeDisabled();
+ await page.keyboard.press('Escape');await expect(page).toHaveURL(/\/#home$/);await expect(page.locator('.adult-shell')).toHaveCount(0);
+ await enter(page);await page.evaluate(()=>sessionStorage.removeItem('aiai:adult-session-consent'));await page.reload();await expect(page.getByRole('heading',{name:'进入18+专区',exact:true})).toBeVisible();await expect(page.locator('.adult-card')).toHaveCount(0);
 });
 for(const width of [320,390,768,1280,1920])test(`visual and images ${width}`,async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});await page.setViewportSize({width,height:width<800?950:1080});await enter(page);await expect(page.locator('.adult-card')).toHaveCount(6);
@@ -47,6 +45,6 @@ test('manual pause, reduced motion, revocation and privacy cleanup',async({page}
  await page.getByRole('button',{name:'退出18+专区',exact:true}).click();await page.goBack();await expect(page.getByRole('heading',{name:'进入18+专区',exact:true})).toBeVisible();await expect(page.locator('.adult-card')).toHaveCount(0);
 });
 test('catalog error and empty states recover',async({page})=>{
- await enter(page);await page.evaluate(async()=>{const {contentService}=await import(performance.getEntriesByType('resource').map(e=>e.name).find(n=>/\/src\/services\/content\.ts(?:\?|$)/.test(n))!);contentService.setPreviewScenario('error');});await page.getByRole('link',{name:'成人短剧',exact:true}).click();await expect(page.getByText('内容加载失败，请重试',{exact:true})).toBeVisible();await page.screenshot({path:`${out}/content-error.png`});
+ await enter(page);await page.evaluate(async()=>{const {contentService}=await import(performance.getEntriesByType('resource').map(e=>e.name).find(n=>/\/src\/services\/content\.ts(?:\?|$)/.test(n))!);contentService.setPreviewScenario('error');});await page.getByRole('link',{name:'愿望榜',exact:true}).click();await page.getByRole('link',{name:'成人短剧',exact:true}).click();await expect(page.getByText('内容加载失败，请重试',{exact:true})).toBeVisible();await page.screenshot({path:`${out}/content-error.png`});
  await page.evaluate(async()=>{const {contentService}=await import('/src/services/content.ts' as string);contentService.setPreviewScenario('empty');});await page.getByRole('button',{name:'重试',exact:true}).click();await expect(page.locator('.adult-card')).toHaveCount(0);await page.screenshot({path:`${out}/content-empty.png`});
 });
