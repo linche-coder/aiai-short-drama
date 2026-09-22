@@ -1,4 +1,4 @@
-import type {FestivalData,FestivalReward} from './festivalModel';
+import type {FestivalData} from './festivalModel';
 import type {MeOverviewDTO,PointsData} from './pointsModel';
 ﻿import type {Content, ContentZone, Tier} from '../types/content';
 import type {SafeEvent} from './analytics';
@@ -9,7 +9,7 @@ export interface MembershipSnapshotDTO {level:number;growth:number;nextLevelGrow
 export interface SessionDTO {subject:string|null;tier:Tier;roles:('content_editor'|'analyst')[];expiresAt:string|null;nickname?:string|null;membership?:MembershipSnapshotDTO|null}
 export interface EligibilityDTO {region:'allowed'|'denied'|'unknown';ageVerified:boolean;granted:boolean;expiresAt:string|null}
 export interface QuoteDTO {id:string;planId:PlanId;group:Experiment;currency:'CNY';total:number;upgradeAmount:number|null;expiresAt:string}
-export interface OrderDTO {id:string;status:'pending'|'processing'|'paid'|'closed'|'refunding'|'refunded';total:number;currency:'CNY';createdAt:string;offerId?:string;paidAt?:string;validity?:'fixed'|'permanent';durationDays?:number|null;entitlementExpiresAt?:string|null;festivalRewards?:FestivalReward[]}
+export interface OrderDTO {id:string;status:'pending'|'processing'|'paid'|'closed'|'refunding'|'refunded';total:number;currency:'CNY';createdAt:string;offerId?:string;paidAt?:string;validity?:'fixed'|'permanent';durationDays?:number|null;extraViewingDays?:number;entitlementExpiresAt?:string|null}
 export interface PlaybackDTO {contentId:string;sources:{src:string;type?:string}[];expiresAt:string;adFree:boolean;maxResolution:number;previewEpisodeIds:string[]}
 export interface ProfileDTO {id:string;nickname:string;avatarUrl:string|null;bio:string}
 export interface CommentDTO {id:string;contentId:string;episodeId:string;parentId:string|null;author:{id:string;nickname:string};content:string;spoiler:boolean;status:'pending'|'published'|'rejected';likeCount:number;liked:boolean;createdAt:string}

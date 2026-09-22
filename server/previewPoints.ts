@@ -7,7 +7,7 @@ import type {Tier,Content} from '../src/types/content';
 import {authenticate,bindReferral,claimFestival,festivalSummary,registerFestivalUser,previewFestivalConfig,type FestivalState} from './previewFestival';
 import type {FestivalConfig} from '../src/services/festivalModel';
 import {randomUUID,scryptSync,timingSafeEqual} from 'node:crypto';
-import {settleFestivalOrder,type FestivalOrder} from './festivalOrders';
+import {extraViewingDaysForOrder,type FestivalOrder} from './festivalOrders';
 import {viewPlan} from './viewPlans';
 
 // Development only. One process serializes each complete mutation, then atomically
@@ -23,9 +23,9 @@ export function createPreviewPoints(file:string,festivalConfig:FestivalConfig=pr
  const paidViewActive=(id:string,now=new Date())=>state.members[id]?.product==='view'&&(isPermanent(id)||Date.parse(state.members[id].expiresAt||'')>now.getTime());
  return {
   member:(id:string)=>state.members[id],tierFor,isPermanent,
-  orders:(userId:string)=>Object.values(state.orders??{}).filter(order=>order.userId===userId).map(order=>({...order,festivalRewards:(state.festival?.rewards[userId]??[]).filter(reward=>reward.orderId===order.id)})),
+  orders:(userId:string)=>Object.values(state.orders??{}).filter(order=>order.userId===userId),
   // Server-only refund hook; a verified full refund is required. No public HTTP route.
-  refundOrder(orderId:string){const next=structuredClone(state),order=next.orders?.[orderId];if(!order||!['paid','refunded'].includes(order.status))throw new Error('invalid_order');order.status='refunded';order.refundedAt??=new Date().toISOString();settleFestivalOrder(next,order,festivalConfig);commit(next);},
+  refundOrder(orderId:string){const next=structuredClone(state),order=next.orders?.[orderId];if(!order||!['paid','refunded'].includes(order.status))throw new Error('invalid_order');if(order.status==='refunded')return;order.status='refunded';order.refundedAt=new Date().toISOString();const member=next.members[order.userId];if(member?.expiresAt&&order.extraViewingDays){member.expiresAt=new Date(Math.max(Date.now(),Date.parse(member.expiresAt)-order.extraViewingDays*86400000)).toISOString();}commit(next);},
   authenticate(id:string,password:unknown){const user=state.festival?.users[id];return authenticate(user,password)?user:undefined;},
   passwordMatches(id:string,password:unknown,fallback?:string){if(typeof password!=='string'||password.length>64)return false;const stored=state.credentials?.[id];if(stored)return timingSafeEqual(Buffer.from(stored.hash,'hex'),scryptSync(password,stored.salt,64));const user=state.festival?.users[id];return user?authenticate(user,password):password===fallback;},
   changePassword(id:string,currentPassword:unknown,newPassword:string,fallback?:string){if(!this.passwordMatches(id,currentPassword,fallback))throw new Error('invalid_current_password');if(newPassword.length<8||newPassword.length>64)throw new Error('invalid_new_password');const next=structuredClone(state),salt=randomUUID();(next.credentials??(next.credentials={}))[id]={salt,hash:scryptSync(newPassword,salt,64).toString('hex')};commit(next);},
@@ -63,11 +63,12 @@ export function createPreviewPoints(file:string,festivalConfig:FestivalConfig=pr
      if(isPermanent(userId))throw new Error('already_permanent');
      if(wallet.requests[key]&&wallet.requests[key]!==offer)throw new Error('idempotency_conflict');
      if(!wallet.requests[key]){
-      const current=next.members[userId],end=new Date(Math.max(Date.now(),Date.parse(current?.expiresAt||'')||0));if(plan.durationDays)end.setUTCDate(end.getUTCDate()+plan.durationDays);
+      const now=new Date().toISOString(),order:FestivalOrder={id:randomUUID(),userId,offerId:offer,total:plan.total,currency:'CNY',createdAt:now,paidAt:now,status:'paid',validity:plan.validity,durationDays:plan.durationDays};
+      order.extraViewingDays=extraViewingDaysForOrder(order,festivalConfig);
+      const current=next.members[userId],end=new Date(Math.max(Date.now(),Date.parse(current?.expiresAt||'')||0));if(plan.durationDays)end.setUTCDate(end.getUTCDate()+plan.durationDays+order.extraViewingDays);
       tier=current?.permanent?current.tier:plan.tier;next.members[userId]={tier,expiresAt:plan.validity==='permanent'?null:current?.permanent?null:end.toISOString(),permanent:plan.validity==='permanent'||current?.permanent===true,product:'view',...(current?.product==='legacy'&&Date.parse(current.expiresAt||'')>Date.now()?{legacyAllowance:monthlyAllowance[current.tier],legacyExpiresAt:current.expiresAt!}:current?.legacyExpiresAt?{legacyAllowance:current.legacyAllowance,legacyExpiresAt:current.legacyExpiresAt}:{})};wallet.requests[key]=offer;
-      const now=new Date().toISOString(),order:FestivalOrder={id:randomUUID(),userId,offerId:offer,total:plan.total,currency:'CNY',createdAt:now,paidAt:now,status:'paid',validity:plan.validity,durationDays:plan.durationDays,entitlementExpiresAt:next.members[userId].expiresAt};
+      order.entitlementExpiresAt=next.members[userId].expiresAt;
       (next.orders??(next.orders={}))[order.id]=order;
-      settleFestivalOrder(next,order,festivalConfig);
      }
     }
    }

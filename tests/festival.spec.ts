@@ -124,16 +124,15 @@ test('late reward response cannot reintroduce the previous account after logout 
  await expect(page.locator('.festival-totals>div').nth(1)).toContainText('0');await expect(page.locator('.points-trigger')).toHaveText('90');
 });
 
-test('membership HTTP concurrent purchase, order ownership, persisted history and UI ledger',async({page})=>{
+test('membership HTTP concurrent purchase grants days once and keeps orders private',async({page})=>{
  const api=await context();await api.post('/api/v1/auth/register',{data:{account:'order_http',password}});
- const results=await Promise.all(Array.from({length:10},()=>api.post('/api/v1/me/points/demo-purchase',{data:{offerId:'premium-year',idempotencyKey:'one-order',bonus:999999,tier:'free'}}).then(r=>r.json())));
- expect(results.every(result=>result.summary.balance===3960)).toBe(true);
- expect((await data(api)).rechargeReward).toBe(3000);expect((await data(api)).appReward).toBe(0);
- const orders=await data(api,'/api/v1/orders');expect(orders).toHaveLength(1);expect(orders[0].festivalRewards).toHaveLength(1);
+ const results=await Promise.all(Array.from({length:10},()=>api.post('/api/v1/me/points/demo-purchase',{data:{offerId:'view-quarter',idempotencyKey:'one-order',bonus:999999,tier:'free'}}).then(r=>r.json())));
+ expect(results.every(result=>result.summary.balance===0)).toBe(true);
+ expect((await data(api)).totalReward).toBe(0);expect((await data(api)).appReward).toBe(0);
+ const orders=await data(api,'/api/v1/orders');expect(orders).toHaveLength(1);expect(orders[0].extraViewingDays).toBe(30);
  const other=await context('festival_other');expect((await other.get('/api/v1/orders/'+orders[0].id)).status()).toBe(404);
  await page.request.post(origin+'/api/v1/auth/sign-in',{data:{account:'order_http',password}});
- await page.goto(origin+'/me/orders');await expect(page.locator('.order-card')).toContainText('双节会员充值加赠 +3000积分');
- await page.locator('.order-card').click();await expect(page.locator('.purchase-festival-bonus')).toContainText('+3000积分');
- await page.getByRole('link',{name:'查看积分明细',exact:true}).click();await expect(page.getByRole('heading',{name:'双节会员充值加赠',exact:true})).toBeVisible();await page.locator('.points-transaction details').click();await expect(page.locator('.points-transaction details')).toContainText(orders[0].id);
+ await page.goto(origin+'/me/orders');await expect(page.locator('.order-card')).toContainText('双节活动加赠 30 天畅看');
+ await page.locator('.order-card').click();await expect(page.locator('.purchase-festival-bonus')).toContainText('+30 天');
  await api.dispose();await other.dispose();
 });

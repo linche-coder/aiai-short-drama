@@ -23,8 +23,8 @@ export function festivalSummary(state:FestivalLedger,userId:string|null,config=p
  if(userId&&!f.codes[userId])f.codes[userId]=randomUUID();
  const records=userId?(f.rewards[userId]??[]).filter(r=>r.activityId===config.id):[],participationReward=records.filter(r=>r.kind==='participation').reduce((n,r)=>n+r.amount,0),invitationReward=records.filter(r=>r.kind==='invitation').reduce((n,r)=>n+r.amount,0);
  const invitations=f.invitations.filter(i=>i.inviter===userId&&i.activityId===config.id);
- const appReward=records.filter(r=>r.kind==='app').reduce((n,r)=>n+r.amount,0),rechargeReward=records.filter(r=>r.kind==='recharge'||r.kind==='recharge_reversal').reduce((n,r)=>n+r.amount,0);
- return {activityId:config.id,phase:festivalPhase(config),startsAt:config.startsAt,endsAt:config.endsAt,demo:true,claimed:records.some(r=>r.kind==='participation'),invitationCode:userId?f.codes[userId]:null,successfulInvites:invitations.length,rewardedInvites:invitations.filter(i=>i.rewarded).length,participationReward,invitationReward,appReward,rechargeReward,totalReward:participationReward+invitationReward+appReward+rechargeReward,records};
+ const appReward=records.filter(r=>r.kind==='app').reduce((n,r)=>n+r.amount,0);
+ return {activityId:config.id,phase:festivalPhase(config),startsAt:config.startsAt,endsAt:config.endsAt,demo:true,claimed:records.some(r=>r.kind==='participation'),invitationCode:userId?f.codes[userId]:null,successfulInvites:invitations.length,rewardedInvites:invitations.filter(i=>i.rewarded).length,participationReward,invitationReward,appReward,totalReward:participationReward+invitationReward+appReward,records:records.filter(r=>r.kind in {participation:1,invitation:1,app:1})};
 }
 export function claimFestival(state:FestivalLedger,userId:string,tier:Tier,config=previewFestivalConfig){
  const current=festivalSummary(state,userId,config);if(current.claimed)return {...current,awarded:false};
