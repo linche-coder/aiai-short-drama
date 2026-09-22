@@ -20,7 +20,7 @@ export function AdultBoundary({children}:{children:ReactNode}){
 }
 export const adultContext:AccessContext={zone:'adult',channel:'preview',adultGranted:true,region:null,tier:'free',sessionVerified:false};
 function useCatalogColumns(){
- const read=()=>window.innerWidth>1100?4:window.innerWidth>760?3:2;
+ const read=()=>window.innerWidth>1100?5:window.innerWidth>760?3:2;
  const [columns,setColumns]=useState(read);
  useEffect(()=>{const update=()=>setColumns(read());window.addEventListener('resize',update);return()=>window.removeEventListener('resize',update);},[]);
  return columns;

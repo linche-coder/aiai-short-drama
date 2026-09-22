@@ -138,3 +138,25 @@
 
 .adult-banner-playback-empty{display:grid;justify-items:center;text-align:center;padding:28px 16px;background:#100b10;border-radius:10px;margin-bottom:22px;color:#cebcc6}
 .adult-banner-playback-empty p{margin:12px 0 0}
+
+/* Supplied covers fit by height, with softened side edges. */
+.adult-shell .adult-cover-slide .adult-cinema-art{background:#100b10}
+.adult-shell .adult-cover-slide .adult-cinema-subject{inset:0 auto 0 50%;width:auto;height:100%;max-width:none;object-fit:contain;object-position:center;transform:translateX(-50%);mask-image:linear-gradient(90deg,transparent 0%,#000 23%,#000 77%,transparent 100%)}
+.adult-shell .adult-cover-slide .adult-cinema-extension{display:none}
+.adult-shell .adult-cover-slide .adult-cinema-shade{background:linear-gradient(0deg,#100b10dc,transparent 42%),linear-gradient(90deg,#100b10b8,transparent 54%)}
+.adult-shell .adult-cover-slide .adult-cinema-copy p{display:-webkit-box;min-height:0;margin-bottom:10px}
+.adult-shell .adult-cover-slide .adult-cinema-status{display:block;width:max-content;padding:4px 10px;margin-bottom:16px;border:1px solid #f3e9e74d;border-radius:6px;background:#100b10a8;color:#f3e9e7}
+.adult-shell .adult-cinema-artwork .adult-cinema-copy{width:34%}
+.adult-shell .adult-cinema-artwork .adult-cinema-picker{width:min(500px,40%);max-width:none;pointer-events:auto}
+.adult-shell .adult-cinema-navigation{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:12px}
+.adult-shell .adult-cinema-navigation .adult-cinema-arrow{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid #f3e9e75c;border-radius:50%;background:#100b10a8;color:#f3e9e7}
+.adult-shell .adult-cinema-navigation .adult-cinema-arrow:hover{background:#b83258;border-color:#e9a2b8}
+.adult-shell .adult-cinema-artwork .adult-cinema-thumbnails{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;overflow:visible;padding:0}
+.adult-shell .adult-cinema-artwork .adult-cinema-thumb{width:100%;min-width:0;aspect-ratio:3/4}
+.adult-shell .adult-cinema-dots{display:flex;justify-content:center;align-items:center;gap:8px;min-height:28px;margin-top:10px}
+.adult-shell .adult-cinema-dots button{width:8px;height:8px;min-width:8px;min-height:8px;padding:0;border:0;border-radius:99px;background:#f3e9e777;transition:width .2s,background .2s}
+.adult-shell .adult-cinema-dots button[aria-current=true]{width:28px;background:#d75882}
+.adult-shell .adult-cinema-dots button:focus-visible{outline:2px solid #ffb2ca;outline-offset:4px}
+@media(min-width:761px){.adult-shell .adult-cinema-artwork .adult-cinema-picker{position:absolute;left:auto;right:0;bottom:22px;transform:none}.adult-shell .adult-cinema-artwork .adult-cinema-copy{align-self:flex-end;margin-bottom:0}}
+@media(max-width:1100px){.adult-shell .adult-cinema-artwork .adult-cinema-copy{width:40%}.adult-shell .adult-cinema-artwork .adult-cinema-picker{width:48%}}
+@media(max-width:760px){.adult-shell .adult-cover-slide .adult-cinema-subject{inset:0 auto 0 50%;width:auto;height:100%;max-width:none;object-fit:contain;object-position:center;mask-image:linear-gradient(90deg,transparent 0%,#000 20%,#000 80%,transparent 100%)}.adult-shell .adult-cover-slide .adult-cinema-shade{background:linear-gradient(0deg,#100b10 0%,#100b10c9 20%,transparent 68%)}.adult-shell .adult-cinema-artwork .adult-cinema-copy,.adult-shell .adult-cinema-artwork .adult-cinema-picker{width:100%}.adult-shell .adult-cinema-navigation{grid-template-columns:36px minmax(0,1fr) 36px;gap:6px}.adult-shell .adult-cinema-navigation .adult-cinema-arrow{width:36px;height:36px}.adult-shell .adult-cinema-artwork .adult-cinema-thumbnails{gap:6px}.adult-shell .adult-cinema-artwork .adult-cinema-thumb{width:100%;min-width:0}}

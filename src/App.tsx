@@ -37,7 +37,7 @@ function SitePages(){const{route,navigate}=useRouter(),logo=useRef<HTMLImageElem
  else if(route.path==='/18plus/search')page=<AdultSearch/>;
  else if(route.path==='/18plus/wishlist')page=<WishlistPage/>;
  else if(privatePlay)page=<PlayPage key={privatePlay[1]} id={decode(privatePlay[1])} adult/>;
- else if(play)page=<PlayPage key={play[2]} id={play[2]==='legacy-adult-preview'?'private-preview-1':decode(play[2])} adult={needsAdult} reading={play[1]==='read'}/>;
+ else if(play)page=<PlayPage key={play[2]} id={play[2]==='legacy-adult-preview'?'landscape-01':decode(play[2])} adult={needsAdult} reading={play[1]==='read'}/>;
  else if(auth)page=<AuthPage kind={auth[1]==='verify'?'verify':'reset'}/>;
  else if(route.path==='/festival')page=<FestivalPage/>;
  else if(route.path==='/membership')page=<MembershipPage/>;
