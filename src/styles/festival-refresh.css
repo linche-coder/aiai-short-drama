@@ -2,12 +2,12 @@
 .festival-strip{position:relative;isolation:isolate;display:block;height:200px;margin:28px 0;overflow:hidden;border:1px solid #b9854e66;border-radius:4px;background:#160d17;box-shadow:0 12px 32px #0003}
 .festival-strip>.festival-artwork{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;pointer-events:none}
 .festival-strip .festival-background img{object-fit:cover;object-position:center 48%}
-.festival-strip .festival-title-art{left:7%;top:6px;width:300px;height:188px;max-height:none;object-fit:contain}
+.festival-strip .festival-title-art{left:7%;top:-8px;width:300px;height:188px;max-height:none;object-fit:contain}
 .festival-strip:after{content:'';position:absolute;inset:5px;z-index:1;border:1px solid #e6b57220;pointer-events:none}
 .festival-strip .festival-strip-action{position:absolute;right:7%;bottom:50%;z-index:2;transform:translateY(50%);display:flex;align-items:center;justify-content:center;gap:16px;min-width:174px;padding:17px 24px;border:1px solid #f1cc90;background:linear-gradient(110deg,#a6502d,#d77c49 48%,#a83c44);box-shadow:inset 0 0 0 4px #f4c0751a;color:#fff0d1;font-size:15px;font-weight:750;letter-spacing:3px;clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px),0 8px);transition:filter .2s}
 .festival-strip:hover .festival-strip-action{filter:brightness(1.15)}
 .festival-strip:focus-visible{outline:3px solid #ffe3ae;outline-offset:4px}
-@media(max-width:600px){.festival-strip{height:180px;margin:22px 0}.festival-strip .festival-title-art{left:2%;top:6px;width:min(66%,270px);height:168px}.festival-strip .festival-background img{object-position:61% center}.festival-strip .festival-strip-action{right:3%;min-width:0;gap:6px;padding:12px 9px;font-size:11px;letter-spacing:0}.festival-strip .festival-strip-action svg{width:14px}}
+@media(max-width:600px){.festival-strip{height:180px;margin:22px 0}.festival-strip .festival-title-art{left:2%;top:-10px;width:min(66%,270px);height:168px}.festival-strip .festival-background img{object-position:61% center}.festival-strip .festival-strip-action{right:3%;min-width:0;gap:6px;padding:12px 9px;font-size:11px;letter-spacing:0}.festival-strip .festival-strip-action svg{width:14px}}
 @media(prefers-reduced-motion:reduce){.festival-strip .festival-strip-action{transition:none}}
 .festival-app-visual>img.festival-phone-illustration{width:155px;height:235px;object-fit:contain;margin:0 -15px 0 0;transform:none;filter:drop-shadow(0 12px 12px #08030a66)}
 .festival-app-visual:has(.festival-phone-illustration){height:255px}
