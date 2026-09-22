@@ -74,7 +74,7 @@ test('responsive layered artwork, all four entry links, clipboard fallback and a
  await page.emulateMedia({reducedMotion:'reduce'});await page.addInitScript(()=>sessionStorage.setItem('aiai:intro-seen','yes'));
  await page.goto(origin+'/#home');await page.locator('.hero-festival a').click();await expect(page).toHaveURL(origin+'/festival');
  await page.goto(origin+'/#home');await page.locator('.festival-strip').click();await expect(page).toHaveURL(origin+'/festival');
- await page.goto(origin+'/shorts');await page.getByRole('link',{name:'双节福利，任务最高领350积分，查看活动',exact:true}).click();await expect(page).toHaveURL(origin+'/festival');
+ await page.goto(origin+'/shorts');await page.getByRole('link',{name:'双节福利，任务最高领350积分，开通畅看会员限时加赠观看天数，查看活动',exact:true}).click();await expect(page).toHaveURL(origin+'/festival');
  await page.goto(origin+'/18plus');await page.getByRole('button',{name:'确认并进入',exact:true}).click();
  await expect(page.locator('.adult-festival-cta')).toBeVisible();await page.locator('.adult-festival-cta').click();await expect(page).toHaveURL(origin+'/festival');
  await page.request.post(origin+'/api/v1/auth/sign-in',{data:{account:'festival_switch',password}});await page.reload();
@@ -93,7 +93,7 @@ test('invitation survives site navigation and registration modal; new user can c
  await page.getByRole('link',{name:'会员中心',exact:true}).click();await page.getByRole('button',{name:'登录 / 注册'}).click();await page.getByRole('tab',{name:'注册',exact:true}).click();
  await page.getByPlaceholder('请输入英文、数字或下划线组合').fill('ui_invited');await page.getByPlaceholder('8–64 个字符').fill(password);await page.getByPlaceholder('再次输入密码').fill(password);await page.getByRole('button',{name:'创建账号',exact:true}).click();
  await expect(page.locator('.account-modal')).toHaveCount(0);expect((await data(host)).invitationReward).toBe(50);
- await page.getByRole('link',{name:'双节福利，任务最高领350积分，查看活动',exact:true}).click();await page.getByRole('button',{name:'立即参与，领取50积分'}).click();await expect(page.locator('.points-trigger')).toHaveText('90');
+ await page.getByRole('link',{name:'双节福利，任务最高领350积分，开通畅看会员限时加赠观看天数，查看活动',exact:true}).click();await page.getByRole('button',{name:'立即参与，领取50积分'}).click();await expect(page.locator('.points-trigger')).toHaveText('90');
  await page.locator('.festival-primary').focus();await expect(page.locator('.festival-primary')).toBeDisabled();await host.dispose();
 });
 
@@ -118,7 +118,7 @@ test('late reward response cannot reintroduce the previous account after logout 
  await page.route('**/api/v1/festival/claim',async route=>{const result=await route.fetch();committed=true;await pending;await route.fulfill({response:result});});
  await page.goto(origin+'/festival');await page.getByRole('button',{name:'立即参与，领取50积分'}).click();await expect.poll(()=>committed).toBe(true);
  await page.locator('.account-avatar-link').click();await page.getByRole('button',{name:'退出账号',exact:true}).click();
- await page.getByRole('link',{name:'双节福利，任务最高领350积分，查看活动',exact:true}).click();await page.getByRole('button',{name:'立即参与，领取50积分'}).click();
+ await page.getByRole('link',{name:'双节福利，任务最高领350积分，开通畅看会员限时加赠观看天数，查看活动',exact:true}).click();await page.getByRole('button',{name:'立即参与，领取50积分'}).click();
  await page.getByPlaceholder('请输入账号').fill('next_reward_user');await page.getByPlaceholder('请输入密码').fill(password);await page.locator('.account-submit').click();
  release();await expect(page.locator('.account-modal')).toHaveCount(0);await expect(page.locator('.festival-primary')).toContainText('已领取50积分');
  await expect(page.locator('.festival-totals>div').nth(1)).toContainText('0');await expect(page.locator('.points-trigger')).toHaveText('90');

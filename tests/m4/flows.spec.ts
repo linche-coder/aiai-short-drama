@@ -7,7 +7,7 @@ async function admin(page:Page){await start(page);await settings(page);await pag
 
 test('public pages and protected direct URLs never request private preview catalog before qualification',async({page})=>{
  const requests:string[]=[],errors:string[]=[];page.on('request',r=>requests.push(r.url()));page.on('pageerror',e=>errors.push(e.message));await start(page,'/');
- for(const path of ['/','/shorts','/comics','/free','/rankings','/search?q=concept','/me','/18plus/play/private-preview-1','/play/private-preview-1','/play/%70rivate-preview-1','/18plus/search','/18plus/wishlist','/membership?context=adult']){await page.goto(path);await page.waitForTimeout(450);expect(await page.locator('[data-zone="adult"]').count()).toBe(0);expect(await page.locator('body').textContent()).not.toContain('专区概念卡');expect(await page.locator('img[src*="private-neutral"]').count()).toBe(0);}
+ for(const path of ['/','/shorts','/comics','/search?q=concept','/me','/18plus/play/private-preview-1','/play/private-preview-1','/play/%70rivate-preview-1','/18plus/search','/18plus/wishlist','/membership?context=adult']){await page.goto(path);await page.waitForTimeout(450);expect(await page.locator('[data-zone="adult"]').count()).toBe(0);expect(await page.locator('body').textContent()).not.toContain('专区概念卡');expect(await page.locator('img[src*="private-neutral"]').count()).toBe(0);}
  expect(requests.filter(u=>u.includes('adultPreview'))).toEqual([]);expect(errors).toEqual([]);await page.reload();await expect(page.getByRole('heading',{name:'进入18+专区前'})).toBeVisible();
 });
 for(const scenario of ['unknown','denied','error'])test(`region ${scenario} refuses premium and retry cannot grant`,async({page})=>{

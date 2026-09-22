@@ -6,8 +6,8 @@ export const festivalConfig={
 };
 export const invitationMaximum=festivalConfig.invitation*festivalConfig.maxInvites;
 export const taskMaximum=festivalConfig.participation+invitationMaximum+festivalConfig.appReward;
-export const festivalEntryLabel=`双节福利 · 任务领${taskMaximum}积分`;
-export const festivalAccessibleLabel=`双节福利，任务最高领${taskMaximum}积分，查看活动`;
+export const festivalEntryLabel=`双节福利 · 任务领${taskMaximum}积分，会员限时加赠天数`;
+export const festivalAccessibleLabel=`双节福利，任务最高领${taskMaximum}积分，开通畅看会员限时加赠观看天数，查看活动`;
 const beijingDate=(value:string)=>new Date(Date.parse(value)+8*3600000).toISOString().slice(0,10);
 const formatDate=(time:number)=>{const value=new Date(time+8*3600000).toISOString();const [year,month,day]=value.slice(0,10).split('-').map(Number);return `${year}年${month}月${day}日${value.slice(11,19)}`;};
 export const festivalDates={short:`${beijingDate(festivalConfig.startsAt).slice(5).replace('-','.')} — ${beijingDate(new Date(Date.parse(festivalConfig.endsAt)-1000).toISOString()).slice(5).replace('-','.')}`,full:`${formatDate(Date.parse(festivalConfig.startsAt))}至${formatDate(Date.parse(festivalConfig.endsAt)-1000)}（北京时间）`};

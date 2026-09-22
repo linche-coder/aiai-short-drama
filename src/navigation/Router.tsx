@@ -33,7 +33,7 @@ export function Router({children}:{children:ReactNode}){
   const saved=readHomeState(url.pathname);if(url.pathname==='/'&&!options.restore&&!options.preserveScroll){saveHomeState({query:'',genre:'全部',scroll:0,hash:url.hash||'#home'});}
   if(options.restore&&url.pathname==='/')url.hash=saved.hash;
   const scroll=options.preserveScroll?scrollY:options.restore?saved.scroll:0;
-  const source=location.pathname+location.search+location.hash;const isList=/^\/(?:$|shorts$|comics$|free$|search$|collections(?:\/|$)|me$|18plus(?:$|\/search$|\/wishlist$))/.test(location.pathname);
+  const source=location.pathname+location.search+location.hash;const isList=/^\/(?:$|shorts$|comics$|search$|me$|18plus(?:$|\/search$|\/wishlist$))/.test(location.pathname);
   const entry={...(url.pathname==='/18plus/wishlist'&&isPrivate(location.pathname)?{adultOrigin:source}:{}),...(/^\/(?:18plus\/)?play\//.test(url.pathname)&&isList?{playOrigin:source}:{}),aiai:{...(isPrivate(url.pathname)?{privateId:crypto.randomUUID()}:{}),scroll:isPrivate(url.pathname)?0:scroll,restore:!!options.restore||!!options.preserveScroll,...(!isPrivate(url.pathname)?{home:readHomeState(url.pathname)}:{})}};
   if(isPrivate(url.pathname)&&entry.aiai.privateId)privateScroll.set(entry.aiai.privateId,options.preserveScroll?scrollY:0);
   if(isPrivate(location.pathname)&&!isPrivate(url.pathname))privateScroll.clear();

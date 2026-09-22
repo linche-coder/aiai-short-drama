@@ -2,7 +2,7 @@
 import {previewCatalog}from'../../src/data/previewCatalog';
 import {canSee,filterInZone,validatePublication,validRights,tierIncludes,hasBaseBenefits,trustedPath,playbackDecision}from'../../src/services/rules';
 import {slotFor}from'../../src/components/Carousel';
-import type{Content,AccessContext,Rights}from'../../src/types/content';
+import type{Content,AccessContext,Rights,Campaign}from'../../src/types/content';
 const green:AccessContext={zone:'green',channel:'preview',region:null,adultGranted:false,tier:'free',sessionVerified:false};
 test('visibility and search isolate zones; offline, article and archived content fail closed',()=>{
  const item=previewCatalog[0],privateItem={...item,content_zone:'adult'} as Content;
@@ -39,6 +39,6 @@ test('content entitlements require verified scope, include base and limit previe
  expect(contentEntitlement(item,{...context,tier:'free'})).toMatchObject({included:false,adFree:false,previewEpisodeIds:['e1']});expect(contentEntitlement(item,{...context,sessionVerified:false}).previewEpisodeIds).toEqual([]);expect(contentEntitlement(item,{...context,region:'US'}).included).toBe(false);
 });
 test('campaigns validate domain, qualification, date and internal destinations',async()=>{
- const{visibleCampaigns}=await import('../../src/services/rules');const{greenCampaigns}=await import('../../src/data/previewCatalog');const now=Date.parse('2026-09-14');expect(visibleCampaigns(greenCampaigns,green,now)).toHaveLength(2);
+ const{visibleCampaigns}=await import('../../src/services/rules');const greenCampaigns:Campaign[]=[{id:'example',title:'专题活动',description:'活动入口',content_zone:'green',starts_at:'2026-01-01',ends_at:'2027-01-01',status:'preview',visibility:'public',target:'/festival',is_demo:true}];const now=Date.parse('2026-09-14');expect(visibleCampaigns(greenCampaigns,green,now)).toHaveLength(1);
  for(const patch of [{content_zone:'adult' as const},{visibility:'qualified' as const},{status:'disabled' as const},{ends_at:'2020-01-01'},{target:'//example.com'},{target:'/18plus'}])expect(visibleCampaigns([{...greenCampaigns[0],...patch}],green,now)).toEqual([]);
 });

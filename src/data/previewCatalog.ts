@@ -1,4 +1,4 @@
-import type {Content, Collection, Campaign} from '../types/content';
+import type {Content} from '../types/content';
 // Restored from the pre-M4 local snapshot. Editorial metadata remains preview-only.
 const entries=[
   {
@@ -111,5 +111,3 @@ const entries=[
   }
 ];
 export const previewCatalog:Content[]=entries.map(({n,title,genre,tagline})=>{const id=`drama-${String(n).padStart(2,'0')}`;return{id,title,genre,tagline,synopsis:tagline,tags:[genre],format:'live_action_drama',content_zone:'green',cover_origin:'provided',age_rating:{system:'本地封面预览（非发行评级）',value:'封面预览',minimum_age:0},region_allowlist:[],rights_status:'pending',rights:null,series_id:null,publication_status:'draft',cover:`/assets/covers/${id}.webp`,thumbnail:`/assets/covers/${id}-small.webp`,largeCover:`/assets/covers/${id}-large.webp`,ambient:`/assets/covers/${id}-ambient.webp`,access_tier:'coin_reserved',original:false,published_at:null,update_status:'unknown',is_demo:true};});
-export const collections:Collection[]=[{id:'everyday-light',name:'都市心事',description:'沿着都市情感题材，发现不同故事。',theme:'都市情感',cover:previewCatalog[1].cover,content_ids:previewCatalog.filter(c=>c.genre==='都市情感').map(c=>c.id),updated_at:'2026-09-14',content_zone:'green',is_demo:true},{id:'imaginary-journey',name:'想象，正在远行',description:'探索奇幻题材的故事。',theme:'奇幻',cover:previewCatalog[3].cover,content_ids:previewCatalog.filter(c=>c.genre==='奇幻').map(c=>c.id),updated_at:'2026-09-14',content_zone:'green',is_demo:true}];
-export const greenCampaigns: Campaign[]=[{id:'first-story',title:'从一部免费故事开始',description:'发现免费范围内的故事。',content_zone:'green',starts_at:'2026-01-01',ends_at:'2027-01-01',status:'preview',visibility:'public',target:'/free',is_demo:true},{id:'genre-discovery',title:'循着题材，发现好故事',description:'循着喜欢的题材，发现值得关注的故事。',content_zone:'green',starts_at:'2026-01-01',ends_at:'2027-01-01',status:'preview',visibility:'public',target:'/rankings',is_demo:true}];
