@@ -5,7 +5,7 @@ import{Link,useRouter}from'../navigation/Router';
 import{track}from'../services/analytics';
 import{accountService}from'../services/membership';
 import{AccountAvatar}from'./AccountAvatar';
-const navItems=[['/','首页'],['/videos','短剧'],['/comics','漫剧'],['/18plus','18+专区'],['/me','我的']] as const;
+const navItems=[['/','首页'],['/videos','真人短剧'],['/comics','AI漫剧'],['/18plus','18+专区']] as const;
 export function Header({query,onSearch,onSubmitSearch,onAccount,onMembership,logoRef,navigation=navItems,isActive,extraActions,brandBadge}:{query?:string;onSearch?:(value:string,composing?:boolean)=>void;onSubmitSearch?:()=>void;onAccount:()=>void;onMembership?:()=>void;logoRef?:RefObject<HTMLImageElement|null>;navigation?:readonly (readonly [string,string])[];isActive?:(href:string)=>boolean;extraActions?:ReactNode;brandBadge?:ReactNode}){
  const{route,navigate}=useRouter(),account=useSyncExternalStore(accountService.subscribe,accountService.getSnapshot);const[draft,setDraft]=useState(route.params.get('q')||'');
  useEffect(()=>{setDraft(route.path==='/search'?route.params.get('q')||'':'');},[route.path,route.search]);
