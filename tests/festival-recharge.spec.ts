@@ -59,13 +59,16 @@ test.beforeEach(async({page})=>{
 
 test('festival page and membership dialog show viewing days',async({page})=>{
  await page.goto('/festival');
- await expect(page.locator('.festival-recharge-task')).toContainText('开通畅看会员赠送观看天数');
+ await expect(page.locator('.festival-recharge-task')).toContainText('国庆畅看加时礼');
  await expect(page.locator('.festival-recharge-task')).toContainText('7天');
  await expect(page.locator('.festival-recharge-task')).toContainText('30天');
  await expect(page.locator('.festival-recharge-task')).not.toContainText('积分');
- await expect(page.locator('.festival-hero .festival-title-art')).toHaveCount(1);
- await expect(page.locator('.festival-hero .festival-title-art')).toHaveAttribute('src','/assets/festival/aiai-festival-kv-complete-v6.png');
- expect(await page.locator('.festival-hero .festival-title-art').evaluate((image:HTMLImageElement)=>image.complete&&image.naturalWidth===1536)).toBe(true);
+ const titleArt=page.locator('.festival-hero .festival-title-art');
+ await expect(titleArt).toHaveAttribute('src','/assets/festival/national-day-title.png');
+ await expect(page.getByText('爱爱短剧 · 国庆专属活动',{exact:true})).toHaveCount(0);
+ await expect(page.getByText('09.19 — 10.07',{exact:true})).toHaveCount(0);
+ await expect(page.locator('.festival-hero .festival-background img')).toHaveAttribute('src','/assets/festival/national-day-background-desktop.png');
+ expect(await page.locator('.festival-hero .festival-background img').evaluate((image:HTMLImageElement)=>image.complete&&image.naturalWidth===1942)).toBe(true);
  await page.getByRole('link',{name:'查看畅看会员礼'}).click();
  await expect(page).toHaveURL(/\/membership$/);
  await expect(page.locator('.membership-festival-bonus')).toHaveCount(2);

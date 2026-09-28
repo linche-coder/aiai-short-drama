@@ -15,7 +15,7 @@ function reward(state:FestivalLedger,userId:string,kind:'participation'|'invitat
  if(records.some(r=>r.activityId===config.id&&r.kind===kind&&(kind==='participation'||r.invitationId===invitationId)))return false;
  const wallet=state.wallets[userId]??(state.wallets[userId]=newWallet()),amount=kind==='participation'?config.participation:config.invitation,id=randomUUID(),transactionId=randomUUID(),createdAt=new Date().toISOString();
  wallet.pointsBalance+=amount;
- wallet.transactions.unshift({id:transactionId,type:kind==='participation'?'festival_participation':'festival_invitation',title:kind==='participation'?'双节活动参与奖励':'双节活动邀请奖励',amount,balanceAfter:wallet.pointsBalance,createdAt,activityId:config.id,rewardId:id,...(invitationId?{invitationId}:{})});
+ wallet.transactions.unshift({id:transactionId,type:kind==='participation'?'festival_participation':'festival_invitation',title:kind==='participation'?'国庆活动参与奖励':'国庆活动邀请奖励',amount,balanceAfter:wallet.pointsBalance,createdAt,activityId:config.id,rewardId:id,...(invitationId?{invitationId}:{})});
  records.unshift({id,activityId:config.id,kind,amount,createdAt,transactionId,...(invitationId?{invitationId}:{})});return true;
 }
 export function festivalSummary(state:FestivalLedger,userId:string|null,config=previewFestivalConfig):FestivalData{

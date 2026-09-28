@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {Check,Gift,Users,Copy,ArrowUpRight,Sparkles,ShieldCheck,Smartphone,Crown} from 'lucide-react';
-import {FestivalArtwork} from '../components/FestivalArtwork';
+import {FestivalArtwork,festivalAssets} from '../components/FestivalArtwork';
 import {Link,useRouter} from '../navigation/Router';
 import {accountService} from '../services/membership';
 import {festivalService,useFestival,festivalError} from '../services/festival';
@@ -10,6 +10,7 @@ import {useFestivalPhase} from '../hooks/useFestivalPhase';
 
 export function FestivalPage(){
  const account=useSyncExternalStore(accountService.subscribe,accountService.getSnapshot);
+ useEffect(()=>{document.title='国庆专属活动 · 爱爱短剧';},[]);
  return <FestivalAccount key={account.userId||'guest'} userId={account.userId}/>;
 }
 function FestivalAccount({userId}:{userId:string|null}){
@@ -25,24 +26,24 @@ function FestivalAccount({userId}:{userId:string|null}){
  async function claim(){
   if(!userId){login('claim');return;}if(busy)return;
   setBusy(true);setError('');setNotice('');setCelebrate(false);
-  try{const result=await festivalService.claim();if(alive.current){setCelebrate(result.awarded===true);setNotice(result.awarded?`${festivalConfig.participation}积分已到账，愿好故事陪你过双节。`:`你已领取过${festivalConfig.participation}积分，无需重复领取。`);}}
+  try{const result=await festivalService.claim();if(alive.current){setCelebrate(result.awarded===true);setNotice(result.awarded?`${festivalConfig.participation}积分已到账，国庆假期好剧陪你尽情看。`:`你已领取过${festivalConfig.participation}积分，无需重复领取。`);}}
   catch(e){if(alive.current)setError(festivalError(e));}finally{if(alive.current)setBusy(false);}
  }
  useEffect(()=>{if(userId&&data&&route.params.get('intent')==='claim'&&!started.current&&!location.pathname.startsWith('/account/')){started.current=true;const params=new URLSearchParams(route.search);params.delete('intent');navigate('/festival'+(params.size?'?'+params:''),{replace:true,preserveScroll:true});if(canClaim)void claim();}},[userId,data,route.search]);
  async function copy(){if(!userId){login('invite');return;}if(!inviteLink)return;try{await navigator.clipboard.writeText(inviteLink);if(alive.current){setCopied(true);setManual(false);}}catch{if(alive.current){setCopied(false);setManual(true);}}}
  return <main ref={root} className="festival-page">
-  <section className="festival-hero" aria-label="中秋国庆双节活动"><FestivalArtwork immersive/></section>
+  <section className="festival-hero" aria-label="国庆专属活动"><FestivalArtwork immersive/></section>
   <div className="festival-body container">
   {!data&&state.error&&<div className="festival-error" role="alert">{state.error} <button className="text-button" onClick={()=>void festivalService.refresh()}>重新加载</button></div>}
   {phase!=='active'&&<p className="festival-status" role="status">{phase==='upcoming'?'活动尚未开始':'活动已结束'}</p>}
-  <div className="festival-section-heading" id="festival-tasks"><h1>双节好礼，马上领取</h1></div>
+  <div className="festival-section-heading" id="festival-tasks"><h1>国庆好礼，马上领取</h1></div>
   <div className="festival-tasks">
-   <section className={`festival-card festival-claim ${claimed?'is-claimed':''}`}><div className="festival-card-top"><span className="festival-step">人人有份</span><Gift size={25}/></div><h2>参与即领{festivalConfig.participation}积分</h2><p>新老用户都能领，每个账号限领一次。</p><img className="festival-prize-art" src="/assets/festival/moon-gift.png" alt=""/><div className="festival-reward-number"><strong>{festivalConfig.participation}</strong><span>积分<small>永久有效</small></span></div>
+   <section className={`festival-card festival-claim ${claimed?'is-claimed':''}`}><div className="festival-card-top"><span className="festival-step">国庆签到礼</span><Gift size={25}/></div><h2>参与即领{festivalConfig.participation}积分</h2><p>新老用户都能领，每个账号限领一次。</p><img className="festival-prize-art" src={festivalAssets.gift} alt=""/><div className="festival-reward-number"><strong>{festivalConfig.participation}</strong><span>积分<small>永久有效</small></span></div>
     <button className="festival-primary" disabled={busy||claimed||!data||!active} onClick={()=>void claim()}>{busy?'正在领取…':claimed?<><Check size={19}/>已领取{festivalConfig.participation}积分</>:phase==='ended'?'活动已结束':!active?'活动尚未开始':`立即参与，领取${festivalConfig.participation}积分`}</button>
     <p className="festival-task-foot"><ShieldCheck size={14}/>积分永久有效，解锁好剧</p>
     {notice&&<p className={celebrate?'festival-success':'festival-info'} role="status">{celebrate&&<Sparkles size={16}/>} {notice}</p>}{error&&<div className="festival-error" role="alert">{error}<button className="text-button" disabled={busy} onClick={()=>void claim()}>重试领取</button></div>}
    </section>
-   <section className="festival-card festival-invite"><div className="festival-card-top"><span className="festival-step">邀好友，好礼加码</span><Users size={25}/></div><h2>邀好友，再领{invitationMaximum}积分</h2><p>每成功邀请1位新用户注册，奖励{festivalConfig.invitation}积分，最多奖励{festivalConfig.maxInvites}位。</p>
+   <section className="festival-card festival-invite"><div className="festival-card-top"><span className="festival-step">邀好友，共享国庆好礼</span><Users size={25}/></div><h2>邀好友，再领{invitationMaximum}积分</h2><p>每成功邀请1位新用户注册，奖励{festivalConfig.invitation}积分，最多奖励{festivalConfig.maxInvites}位。</p>
     <div className="festival-stamps" aria-label="邀请奖励进度">{Array.from({length:festivalConfig.maxInvites},(_,i)=><div key={i} className={i<(data?.rewardedInvites||0)?'earned':''}><span>{i<(data?.rewardedInvites||0)?<Check size={18}/>:<Gift size={18}/>}</span><strong>+{festivalConfig.invitation}</strong><small>{i<(data?.rewardedInvites||0)?'已到账':`第${i+1}位`}</small></div>)}</div>
     <div className="festival-invite-progress"><span>已成功邀请 <strong>{Math.min(data?.successfulInvites||0,festivalConfig.maxInvites)}/{festivalConfig.maxInvites}</strong> 位</span><span>{(data?.rewardedInvites||0)>=festivalConfig.maxInvites?'邀请奖励已达上限':`最高${invitationMaximum}积分`}</span></div>
     {(data?.successfulInvites||0)>festivalConfig.maxInvites&&<p>累计成功邀请{data?.successfulInvites}位，超出{festivalConfig.maxInvites}位不再计奖。</p>}
@@ -51,8 +52,8 @@ function FestivalAccount({userId}:{userId:string|null}){
     {manual&&<label className="festival-manual">未能自动复制，请长按或选中下方链接复制<input aria-label="专属邀请链接" readOnly value={inviteLink} onFocus={e=>e.currentTarget.select()}/></label>}
     <p className="festival-task-foot">分享或打开链接不会发奖，以有效的新用户注册为准。</p>
    </section>
-   <section className="festival-card festival-app"><div className="festival-card-top"><span className="festival-step">App专享</span><Smartphone size={25}/></div><h2>下载App，再领{festivalConfig.appReward}积分</h2><p>下载爱爱短剧App，在App内打开活动页即可领取。</p><div className="festival-app-visual" aria-hidden="true"><img className="festival-phone-illustration" src="/assets/festival/app-phone-illustration.png" alt=""/><img src="/assets/festival/moon-gift.png" alt=""/></div><a className="festival-secondary" href={festivalConfig.appDownloadUrl||undefined} role="link" tabIndex={0} onClick={e=>{if(!festivalConfig.appDownloadUrl){e.preventDefault();setAppNotice(true);}}} onKeyDown={e=>{if(e.key==='Enter'&&!festivalConfig.appDownloadUrl){e.preventDefault();setAppNotice(true);}}}>下载App <ArrowUpRight size={17}/></a>{appNotice&&<p role="status" className="festival-copy-feedback">下载页面即将上线</p>}<p className="festival-task-foot">每个账号限领一次，前往App领取</p></section>
-   <section className="festival-card festival-recharge-task"><div className="festival-card-top"><span className="festival-step">开通畅看会员赠送观看天数</span><Crown size={25}/></div><h2>开通或续费，畅看更久</h2><p>活动期间开通畅看月卡或季卡，额外增加会员观看天数。</p><div className="festival-bonus-grid">{festivalOffers.map(offer=><div key={offer.id}><span>{offer.name}</span><strong>+{extraViewingDaysFor(offer.id)}<small>天</small></strong></div>)}</div><Link className="festival-secondary" href={festivalRechargePath}>查看畅看会员礼 <ArrowUpRight size={17}/></Link><p className="festival-task-foot">活动期内支付成功后，赠送天数自动计入会员有效期</p></section>
+   <section className="festival-card festival-app"><div className="festival-card-top"><span className="festival-step">国庆 App 专享</span><Smartphone size={25}/></div><h2>下载App，再领{festivalConfig.appReward}积分</h2><p>下载爱爱短剧App，在App内打开活动页即可领取。</p><div className="festival-app-visual" aria-hidden="true"><img className="festival-phone-illustration" src="/assets/festival/app-phone-illustration.png" alt=""/><img src={festivalAssets.gift} alt=""/></div><a className="festival-secondary" href={festivalConfig.appDownloadUrl||undefined} role="link" tabIndex={0} onClick={e=>{if(!festivalConfig.appDownloadUrl){e.preventDefault();setAppNotice(true);}}} onKeyDown={e=>{if(e.key==='Enter'&&!festivalConfig.appDownloadUrl){e.preventDefault();setAppNotice(true);}}}>下载App <ArrowUpRight size={17}/></a>{appNotice&&<p role="status" className="festival-copy-feedback">下载页面即将上线</p>}<p className="festival-task-foot">每个账号限领一次，前往App领取</p></section>
+   <section className="festival-card festival-recharge-task"><div className="festival-card-top"><span className="festival-step">国庆畅看加时礼</span><Crown size={25}/></div><h2>开通或续费，畅看更久</h2><p>活动期间开通畅看月卡或季卡，额外增加会员观看天数。</p><div className="festival-bonus-grid">{festivalOffers.map(offer=><div key={offer.id}><span>{offer.name}</span><strong>+{extraViewingDaysFor(offer.id)}<small>天</small></strong></div>)}</div><Link className="festival-secondary" href={festivalRechargePath}>查看畅看会员礼 <ArrowUpRight size={17}/></Link><p className="festival-task-foot">活动期内支付成功后，赠送天数自动计入会员有效期</p></section>
   </div>
   <section className="festival-card festival-account"><div className="festival-section-row"><div><h2>我的活动奖励</h2></div><Link href="/me/points?tab=transactions" className="text-button">查看积分明细 <ArrowUpRight size={16}/></Link></div>
    <div className="festival-totals">{[['参与奖励',data?.participationReward],['邀请奖励',data?.invitationReward],['App奖励',data?.appReward??0],['本次活动累计积分',data?.totalReward],['成功邀请人数',data?.successfulInvites]].map(([label,value],i)=><div key={label}><span>{label}</span><strong>{userId&&data?value:'—'}<small>{i===4?'位':'积分'}</small></strong></div>)}</div>

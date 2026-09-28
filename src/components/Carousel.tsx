@@ -105,7 +105,7 @@ function CarouselTrack({items,initialIndex=0,initialId,initialPaused=false,reduc
     <div className="hero-inner"><div className="carousel-stage">
       {items.map((item,i)=>{const slot=slotFor(i,index,items.length); const visible=Math.abs(slot)<=(wide?2:1);return <article key={item.id} hidden={!visible} className={`hero-poster offset-${slot} ${item.id==='festival'?'hero-festival':''}`} data-slot={slot} data-outer={Math.abs(slot)===2} data-drama-id={item.id} aria-current={slot===0?'true':undefined} style={{transform:position(slot)}}>
         <Link className="hero-surface drama-link" href={item.id==='festival'?'/festival':contentHref(item)} tabIndex={visible?0:-1} aria-label={item.id==='festival'?festivalAccessibleLabel:`${contentLabel(item)}：${item.title}，${item.genre}，${availability(item)}`}>
-          {item.id==='festival'?<><FestivalArtwork compact portrait/><span className="festival-carousel-cta">去领双节好礼 <ChevronRight size={16}/></span></>:<><div className="hero-cover"><Poster drama={item} priority /><span className="cover-shade" /></div><span className="poster-edge" />
+          {item.id==='festival'?<><FestivalArtwork compact portrait/><span className="festival-carousel-cta">去领国庆好礼 <ChevronRight size={16}/></span></>:<><div className="hero-cover"><Poster drama={item} priority /><span className="cover-shade" /></div><span className="poster-edge" />
           {slot===0 && <span className="featured-badge">本期精选</span>}<CardInfo drama={item} banner /></>}
         </Link>
       </article>;})}
